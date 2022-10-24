@@ -12,9 +12,14 @@ class MovieDao(Dao):
     product = MediaProduct(
       title=film_data.title,
       release=film_data.release,
+      synopsis=film_data.synopsis,
       img_path=film_data.img_path
     )
-    movie = Movie(product=product, runtime=film_data.runtime)
+    movie = Movie(
+      product=product,
+      runtime=film_data.runtime,
+      director=film_data.director
+    )
     db.session.add(movie)
     db.session.flush()
     for genre in genres:
@@ -32,8 +37,10 @@ class MovieDao(Dao):
       title=result.product.title,
       release=result.product.release,
       img_path=result.product.img_path,
+      synopsis=result.product.synopsis,
       genres=[genre.name for genre in result.product.genres],
-      runtime=result.runtime
+      runtime=result.runtime,
+      director=result.director
     )
 
   def __insert_new_genres(genres: list[str]) -> list[dict]:

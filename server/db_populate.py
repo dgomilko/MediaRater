@@ -6,7 +6,7 @@ from dao.reviewDao import MovieReviewDao
 from db.structs import MovieType, ReviewType, UserType
 from db.models import MediaProduct, User, Movie
 
-LIMIT = 300
+LIMIT = 100
 PATH = './media_data/movies_dataset_from_allmovie.csv'
 
 users = [
@@ -30,6 +30,8 @@ def populate_with_movies():
         release=row['released_at'],
         img_path=row['poster'],
         runtime=row['duration'],
+        synopsis=row['synopsis'],
+        director=row['director'],
         genres=row['genre'].split(' ')
       )
       movies.append(movie_data)

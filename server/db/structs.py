@@ -6,11 +6,13 @@ class MediaProductType:
   title: string
   release: string
   img_path: string
+  synopsis: string
   genres: list[str]
 
 @dataclass
 class MovieType(MediaProductType):
   runtime: string
+  director: string
 
 @dataclass
 class UserType:

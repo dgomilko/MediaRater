@@ -1,3 +1,4 @@
+from pydoc import synopsis
 from db.database import db
 from utils import generate_key
 
@@ -13,6 +14,7 @@ class MediaProduct(db.Model):
   title = db.Column(db.String(100), nullable=False)
   release = db.Column(db.String(30), nullable=False)
   img_path = db.Column(db.String(300), nullable=False)
+  synopsis = db.Column(db.Text, nullable=False)
   genres = db.relationship(
     'Genre',
     secondary=movie_genres,
@@ -42,6 +44,7 @@ class Movie(db.Model):
     backref=db.backref('movies', uselist=False)
   )
   runtime = db.Column(db.String(20), nullable=False)
+  director = db.Column(db.String(100), nullable=False)
   reviews = db.relationship(
     'MovieReview',
     back_populates='movie'
