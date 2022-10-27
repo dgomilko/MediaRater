@@ -15,6 +15,16 @@ class MovieType(MediaProductType):
   director: string
 
 @dataclass
+class BookType(MediaProductType):
+  pages: string
+  author: string
+
+@dataclass
+class ShowType(MediaProductType):
+  seasons: int
+  episodes: int
+
+@dataclass
 class UserType:
   name: string
   email: string

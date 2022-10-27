@@ -1,6 +1,5 @@
-from pydoc import synopsis
 from db.database import db
-from utils import generate_key
+from db.mixins import IntIdMixin, StrIdMixin, ProductMixin, ReviewMixin
 
 movie_genres = db.Table(
     'movie_genres',
@@ -8,10 +7,9 @@ movie_genres = db.Table(
     db.Column("genre_id", db.ForeignKey('genres.id'), primary_key=True),
 )
 
-class MediaProduct(db.Model):
+class MediaProduct(IntIdMixin, db.Model):
   __tablename__ = 'media_products'
-  id = db.Column(db.Integer, primary_key=True)
-  title = db.Column(db.String(100), nullable=False)
+  title = db.Column(db.String(150), nullable=False)
   release = db.Column(db.String(30), nullable=False)
   img_path = db.Column(db.String(300), nullable=False)
   synopsis = db.Column(db.Text, nullable=False)
@@ -21,62 +19,44 @@ class MediaProduct(db.Model):
     backref='content'
   )
 
-class Genre(db.Model):
+class Genre(IntIdMixin, db.Model):
   __tablename__ = 'genres'
-  id = db.Column(db.Integer, primary_key=True)
   name = db.Column(db.String(50), nullable=False, unique=True)
 
-class Movie(db.Model):
+class Movie(ProductMixin, db.Model):
   __tablename__ = 'movies'
-  id = db.Column(
-    db.String(22),
-    primary_key=True,
-    autoincrement=False,
-    default=generate_key
-  )
-  product_id = db.Column(
-    db.Integer,
-    db.ForeignKey('media_products.id'),
-    nullable=True
-  )
-  product = db.relationship(
-    'MediaProduct',
-    backref=db.backref('movies', uselist=False)
-  )
   runtime = db.Column(db.String(20), nullable=False)
   director = db.Column(db.String(100), nullable=False)
-  reviews = db.relationship(
-    'MovieReview',
-    back_populates='movie'
-  )
 
-class User(db.Model):
+class Book(ProductMixin, db.Model):
+  __tablename__ = 'books'
+  pages = db.Column(db.String(5), nullable=False)
+  author = db.Column(db.String(100), nullable=False)
+
+class Show(ProductMixin, db.Model):
+  __tablename__ = 'shows'
+  seasons = db.Column(db.Integer, nullable=False)
+  episodes = db.Column(db.Integer, nullable=False)
+
+class User(StrIdMixin, db.Model):
   __tablename__ = 'users'
-  id = db.Column(
-    db.String(22),
-    primary_key=True,
-    autoincrement=False,
-    default=generate_key
-  )
   name = db.Column(db.String(50), nullable=False)
   email = db.Column(db.String(100), unique=True)
   movie_reviews = db.relationship(
     'MovieReview',
     back_populates='user'
   )
+  book_reviews = db.relationship(
+    'BookReview',
+    back_populates='user'
+  )
+  show_reviews = db.relationship(
+    'ShowReview',
+    back_populates='user'
+  )
 
-class MovieReview(db.Model):
+class MovieReview(ReviewMixin, db.Model):
   __tablename__ = 'movie_reviews'
-  id = db.Column(db.Integer, primary_key=True)
-  user_id = db.Column(
-    db.String(22),
-    db.ForeignKey('users.id')
-  )
-  user = db.relationship(
-    'User',
-    back_populates='movie_reviews',
-    uselist=False
-  )
   movie_id = db.Column(
     db.String(22),
     db.ForeignKey('movies.id')
@@ -86,5 +66,27 @@ class MovieReview(db.Model):
     back_populates='reviews',
     uselist=False
   )
-  text = db.Column(db.Text, nullable=True)
-  rate = db.Column(db.Integer, nullable=False)
+
+class BookReview(ReviewMixin, db.Model):
+  __tablename__ = 'book_reviews'
+  book_id = db.Column(
+    db.String(22),
+    db.ForeignKey('books.id')
+  )
+  book = db.relationship(
+    'Book',
+    back_populates='reviews',
+    uselist=False
+  )
+
+class ShowReview(ReviewMixin, db.Model):
+  __tablename__ = 'show_reviews'
+  show_id = db.Column(
+    db.String(22),
+    db.ForeignKey('shows.id')
+  )
+  show = db.relationship(
+    'Show',
+    back_populates='reviews',
+    uselist=False
+  )

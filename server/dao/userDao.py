@@ -15,6 +15,6 @@ class UserDao(Dao):
     return super(UserDao, UserDao).commit()
 
   @staticmethod
-  def get_user_by_id(uid: str) -> UserType:
+  def get_by_id(uid: str) -> UserType:
     result = super(UserDao, UserDao).get_by_id(User, uid)
     return UserType(name=result.name, email=result.email)
