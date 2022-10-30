@@ -2,13 +2,12 @@ from dataclasses import dataclass
 from sqlalchemy.exc import IntegrityError
 from dao.dao import Dao
 from db.database import db
-from db.models import Book, MediaProduct, Movie, Genre, Show, movie_genres
+from db.models import Book, MediaProduct, Movie, Genre, Show, product_genres
 from db.structs import BookType, MovieType, ShowType
 
 class ProductDao(Dao):
   @staticmethod
   def add_product(product_data: dataclass, model: db.Model, args: dict) -> bool:
-    genres = ProductDao.__insert_new_genres(product_data.genres)
     product = MediaProduct(
       title=product_data.title,
       release=product_data.release,
@@ -16,19 +15,26 @@ class ProductDao(Dao):
       img_path=product_data.img_path
     )
     subproduct = model(product=product, **args)
+    if not product_data.genres:
+      db.session.add(subproduct)
+      return super(ProductDao, ProductDao).commit()
+    genres = ProductDao.__insert_new_genres(product_data.genres)
     db.session.add(subproduct)
     db.session.flush()
     for genre in genres:
-      statement = movie_genres.insert().values(
+      statement = product_genres.insert().values(
         product_id=subproduct.product.id,
         genre_id=genre['id']
       )
       db.session.execute(statement)
-    return super(ProductDao, ProductDao).commit()
+      res = super(ProductDao, ProductDao).commit()
+      if not res: return False
+    return True
   
   @staticmethod
-  def get_product_by_id(pid: str) -> dict:
-    result = super(MovieDao, MovieDao).get_by_id(Movie, pid)
+  def get_product_by_id(pid: str, model: db.Model) -> tuple[any, dict]:
+    result = super(ProductDao, ProductDao).get_by_id(model, pid)
+    if result is None: return (None, None)
     common = {
       'title': result.product.title,
       'release': result.product.release,
@@ -38,6 +44,19 @@ class ProductDao(Dao):
     }
     return (result, common)
   
+  @staticmethod
+  def get_reviews(pid: str, model: db.Model, attr: str):
+    result = super(ProductDao, ProductDao).get_by_id(model, pid)
+    if result is None: return result
+    return [{
+      'text': r.text,
+      'rate': r.rate,
+      'author': r.user.name,
+      'author_id': r.user_id,
+      'product': getattr(r, attr).product.title,
+      'product_id': getattr(r, f'{attr}_id')
+    } for r in result.reviews]
+    
   def __insert_new_genres(genres: list[str]) -> list[dict]:
     result = list()
     for genre_name in genres:
@@ -63,13 +82,14 @@ class MovieDao(ProductDao):
       .add_product(film_data, Movie, specific_args)
 
   @staticmethod
-  def get_by_id(pid: str) -> MovieType:
-    result, common = super(MovieDao, MovieDao).get_product_by_id(pid)
-    return MovieType(
-      runtime=result.runtime,
-      director=result.director,
+  def get_by_id(pid: str) -> dict:
+    result, common = super(MovieDao, MovieDao) \
+      .get_product_by_id(pid, Movie)
+    return result if result is None else {
+      'runtime': result.runtime,
+      'director': result.director,
       **common
-    )
+    }
 
 class BookDao(ProductDao):
   @staticmethod
@@ -82,13 +102,14 @@ class BookDao(ProductDao):
       .add_product(book_data, Book, specific_args)
 
   @staticmethod
-  def get_by_id(pid: str) -> BookType:
-    result, common = super(BookDao, BookDao).get_product_by_id(pid)
-    return BookType(
-      pages=result.pages,
-      author=result.author,
+  def get_by_id(pid: str) -> dict:
+    result, common = super(BookDao, BookDao) \
+      .get_product_by_id(pid, Book)
+    return result if result is None else {
+      'pages': result.pages,
+      'author': result.author,
       **common
-    )
+    }
 
 class ShowDao(ProductDao):
   @staticmethod
@@ -102,9 +123,10 @@ class ShowDao(ProductDao):
 
   @staticmethod
   def get_by_id(pid: str) -> ShowType:
-    result, common = super(BookDao, BookDao).get_product_by_id(pid)
-    return BookType(
-      pages=result.pages,
-      author=result.author,
+    result, common = super(ShowDao, ShowDao) \
+      .get_product_by_id(pid, Show)
+    return result if result is None else {
+      'seasons': result.seasons,
+      'episodes': result.episodes,
       **common
-    )
+    }

@@ -1,91 +1,94 @@
-import csv
+import pandas as pd
 from dataclasses import dataclass
 from random import sample, randint
-from dao.product_daos import BookDao, MovieDao, ProductDao, ShowDao
+from dao.product_daos import *
 from dao.userDao import UserDao
-from dao.review_daos import BookReviewDao, MovieReviewDao, ShowReviewDao
-from db.structs import BookType, MovieType, ReviewType, ShowType, UserType
-from db.models import Book, MediaProduct, Show, User, Movie
+from dao.review_daos import *
+from db.structs import *
+from db.models import *
 
-LIMIT = 100
-PATH1 = './media_data/movies.csv'
-PATH2 = './media_data/books.csv'
-PATH3 = './media_data/shows.csv'
+LIMIT = 20
+MOVIES_PATH = './media_data/movies.csv'
+BOOKS_PATH = './media_data/books.csv'
+SHOWS_PATH = './media_data/shows.csv'
 
 users = [
-  UserType(name='user1', email='sada@gmail.com'),
-  UserType(name='user2', email='adsad@gmail.com'),
-  UserType(name='user3', email='oooo4234@gmail.com'),
-  UserType(name='user4', email='ad___e@gmail.com')
+  UserType(
+    name='user1',
+    email='sada@gmail.com',
+    country='GB',
+    birthday='1990.08.12',
+    password='asdkl34jk',
+    gender='f'
+  ),
+  UserType(
+    name='user2',
+    email='adsad@gmail.com',
+    country='Sweden',
+    birthday='1999.10.14',
+    password='asdkl34jk',
+    gender='m'
+  ),
+  UserType(
+    name='user3',
+    email='oooo4234@gmail.com',
+    country='Ukraine',
+    birthday='2000.10.14',
+    password='asdkl34jk',
+    gender='m'
+  ),
+  UserType(
+    name='user4',
+    email='ad___e@gmail.com',
+    country='Ukraine',
+    birthday='2001.12.11',
+    password='asdkl34jk',
+    gender='f'
+  )
 ]
+
+db_details = {
+  MOVIES_PATH: [Movie, MovieType, MovieDao, MovieReviewDao],
+  BOOKS_PATH: [Book, BookType, BookDao, BookReviewDao],
+  SHOWS_PATH: [Show, ShowType, ShowDao, ShowReviewDao]
+}
 
 def populate_product(
   path: str,
   product_type: dataclass,
   product_dao: ProductDao
-):
+) -> list[dataclass]:
   products = list()
-  with open(path) as csv_file:
-    reader = csv.DictReader(csv_file)
-    count = 0
-    for row in reader:
-      if count == LIMIT: break
-      count += 1
-      row['genres'] = row['genres'].split(', ') if len(row['genres']) else []
-      movie_data = product_type(**row)
-      products.append(movie_data)
-      product_dao.add_new(movie_data)
+  data = pd.read_csv(path, keep_default_na=False).T.to_dict()
+  for row in list(data.values())[:LIMIT]:
+    row['genres'] = row['genres'].split(', ') if len(row['genres']) else []
+    product_data = product_type(**row)
+    products.append(product_data)
+    product_dao.add_new(product_data)
   return products
 
-# def populate_with_movies():
-#     movies = populate_product(PATH1, MovieType, MovieDao)
+def populate_reviews(
+  products: list[dataclass],
+  review_dao: ReviewDao,
+  product_model: any
+):
+  for user in users:
+    db_user = User.query.filter_by(name=user.name).first()
+    reiewed_products = sample(products, randint(0, 10))
+    for product in reiewed_products:
+      db_product = product_model.query.join(MediaProduct) \
+        .filter_by(title=product.title).first()
+      review_data = ReviewType(
+        user_id=db_user.id,
+        product_id=db_product.id,
+        rate=randint(0, 5)
+      )
+      review_dao.add_new(review_data)
 
-#     for user in users: UserDao.add_user(user)
-
-#     for user in users:
-#       db_user = User.query.filter_by(name=user.name).first()
-#       reiewed_movies = sample(movies, randint(0, 100))
-#       for movie in reiewed_movies:
-#         db_movie = Movie.query.join(MediaProduct).filter_by(title=movie.title).first()
-#         review_data = ReviewType(
-#           user_id=db_user.id,
-#           product_id=db_movie.id,
-#           rate=randint(0, 5)
-#         )
-#         MovieReviewDao.add_new(review_data)
-
-  
-def populate_with_movies():
-    movies = populate_product(PATH2, BookType, BookDao)
-
-    for user in users: UserDao.add_user(user)
-    
-    for user in users:
-      db_user = User.query.filter_by(name=user.name).first()
-      reiewed_books = sample(movies, randint(0, 100))
-      for book in reiewed_books:
-        db_book = Book.query.join(MediaProduct).filter_by(title=book.title).first()
-        review_data = ReviewType(
-          user_id=db_user.id,
-          product_id=db_book.id,
-          rate=randint(0, 5)
-        )
-        BookReviewDao.add_new(review_data)
-
-
-# def populate_with_movies():
-#     movies = populate_product(PATH3, ShowType, ShowDao)
-
-#     for user in users: UserDao.add_user(user)
-    
-#     for user in users:
-#       db_user = User.query.filter_by(name=user.name).first()
-#       reiewed_movies = sample(movies, randint(0, 100))
-#       for movie in reiewed_movies:
-#         db_movie = Show.query.join(MediaProduct).filter_by(title=movie.title).first()
-#         review_data = ReviewType(
-#           user_id=db_user.id,
-#           product_id=db_movie.id,
-#           rate=randint(0, 5)
-#         )
-#         ShowReviewDao.add_new(review_data)
+def populate_db():
+  for user in users: UserDao.add_user(user)
+  for path, (
+    product_model, product_type, product_dao, review_dao
+  ) in db_details.items():
+    products = populate_product(path, product_type, product_dao)
+    populate_reviews(products, review_dao, product_model)

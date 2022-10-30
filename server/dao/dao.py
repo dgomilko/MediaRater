@@ -9,10 +9,11 @@ class Dao():
     try:
       db.session.commit()
       return True
-    except SQLAlchemyError:
+    except SQLAlchemyError as e:
+      print(e)
       db.session.rollback()
       return False
 
   @staticmethod
-  def get_by_id(model: db.Model, id: str):
+  def get_by_id(model: db.Model, id: str) -> any:
     return model.query.filter_by(id=id).first()

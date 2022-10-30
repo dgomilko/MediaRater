@@ -1,8 +1,15 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from datetime import datetime
 import string
 
 @dataclass
-class MediaProductType:
+class BaseDC:
+  def as_dict(self):
+    data = self.__dict__
+    return {key: value for key, value in data.items() if value is not None}
+
+@dataclass
+class MediaProductType(BaseDC):
   title: string
   release: string
   img_path: string
@@ -25,13 +32,18 @@ class ShowType(MediaProductType):
   episodes: int
 
 @dataclass
-class UserType:
+class UserType(BaseDC):
   name: string
   email: string
+  birthday: string
+  gender: string
+  country: string
+  password: string = None
+  id: string = None
 
 @dataclass
-class ReviewType:
+class ReviewType(BaseDC):
   rate: int
-  user_id: string = ''
-  product_id: string = ''
-  text: string = ''
+  user_id: string = None
+  product_id: string = None
+  text: string = None

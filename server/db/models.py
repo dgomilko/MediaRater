@@ -1,10 +1,17 @@
+import bcrypt
+from sqlalchemy.orm import validates
+from sqlalchemy.ext.hybrid import hybrid_property
 from db.database import db
-from db.mixins import IntIdMixin, StrIdMixin, ProductMixin, ReviewMixin
+from db.mixins import *
 
-movie_genres = db.Table(
-    'movie_genres',
-    db.Column('product_id', db.ForeignKey('media_products.id'), primary_key=True),
+product_genres = db.Table(
+    'product_genres',
     db.Column("genre_id", db.ForeignKey('genres.id'), primary_key=True),
+    db.Column(
+      'product_id',
+      db.ForeignKey('media_products.id'),
+      primary_key=True
+    ),
 )
 
 class MediaProduct(IntIdMixin, db.Model):
@@ -15,7 +22,7 @@ class MediaProduct(IntIdMixin, db.Model):
   synopsis = db.Column(db.Text, nullable=False)
   genres = db.relationship(
     'Genre',
-    secondary=movie_genres,
+    secondary=product_genres,
     backref='content'
   )
 
@@ -42,6 +49,10 @@ class User(StrIdMixin, db.Model):
   __tablename__ = 'users'
   name = db.Column(db.String(50), nullable=False)
   email = db.Column(db.String(100), unique=True)
+  _password = db.Column(db.String(100))
+  country = db.Column(db.String(50))
+  birthday = db.Column(db.DateTime)
+  gender = db.Column(db.String(1))
   movie_reviews = db.relationship(
     'MovieReview',
     back_populates='user'
@@ -54,6 +65,20 @@ class User(StrIdMixin, db.Model):
     'ShowReview',
     back_populates='user'
   )
+
+  @validates('gender')
+  def validate_gender(self: db.Model, key: str, gender: str) -> str:
+    assert gender in ['m', 'f']
+    return gender
+
+  @hybrid_property
+  def password(self):
+    return self._password
+
+  @password.setter
+  def password(self, password):
+    pwhash = bcrypt.hashpw(password.encode('utf8'), bcrypt.gensalt())
+    self._password = pwhash.decode('utf8')
 
 class MovieReview(ReviewMixin, db.Model):
   __tablename__ = 'movie_reviews'
@@ -69,11 +94,11 @@ class MovieReview(ReviewMixin, db.Model):
 
 class BookReview(ReviewMixin, db.Model):
   __tablename__ = 'book_reviews'
-  book_id = db.Column(
+  product_id = db.Column(
     db.String(22),
     db.ForeignKey('books.id')
   )
-  book = db.relationship(
+  product = db.relationship(
     'Book',
     back_populates='reviews',
     uselist=False
@@ -81,7 +106,7 @@ class BookReview(ReviewMixin, db.Model):
 
 class ShowReview(ReviewMixin, db.Model):
   __tablename__ = 'show_reviews'
-  show_id = db.Column(
+  product_id = db.Column(
     db.String(22),
     db.ForeignKey('shows.id')
   )
