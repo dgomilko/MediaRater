@@ -2,6 +2,7 @@ from dao.dao import Dao
 from db.database import db
 from db.models import User
 from db.structs import UserType
+from dao.review_mapper import get_reviews
 
 class UserDao(Dao):
 
@@ -27,15 +28,8 @@ class UserDao(Dao):
   def get_reviews(uid: str, attr: str) -> list[dict]:
     result = super(UserDao, UserDao).get_by_id(User, uid)
     if result is None: return result
-    return [{
-      'text': r.text,
-      'rate': r.rate,
-      'author': r.user.name,
-      'author_id': r.user_id,
-      f'{attr}': getattr(r, attr).product.title,
-      f'{attr}_id': getattr(r, f'{attr}_id')
-    } for r in getattr(result, f'{attr}_reviews')]
-
+    return get_reviews(getattr(result, f'{attr}_reviews'))
+    
   __user_as_dict = lambda result: {
       'name': result.name,
       'email': result.email,

@@ -34,7 +34,7 @@ class ProductMixin(StrIdMixin, object):
     name = cls.__name__
     return db.relationship(
       f'{name}Review',
-      back_populates=name.lower()
+      back_populates='product'
     )
 
 class ReviewMixin(IntIdMixin, object):

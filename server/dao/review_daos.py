@@ -5,24 +5,20 @@ from db.structs import ReviewType
 
 class ReviewDao(Dao):
   @staticmethod
-  def add_product_review(
-    review_data: ReviewType,
-    model: db.Model,
-    pid: str
-  ) -> bool:
+  def add_product_review(review_data: ReviewType, model: db.Model) -> bool:
     review = model(
       user_id=review_data.user_id,
       text=review_data.text,
       rate=review_data.rate,
-      **{pid: review_data.product_id}
+      product_id=review_data.product_id
     )
     db.session.add(review)
     return super(ReviewDao, ReviewDao).commit()
   
   @staticmethod
-  def get_product_ratings(model: db.Model, id_type: any) -> list[tuple]:
+  def get_product_ratings(model: db.Model) -> list[tuple]:
     return model.query.with_entities(
-      id_type,
+      model.product_id,
       model.user_id,
       model.rate
     ).all()
@@ -38,12 +34,12 @@ class MovieReviewDao(ReviewDao):
   @staticmethod
   def add_new(review_data: ReviewType) -> bool:
     return super(MovieReviewDao, MovieReviewDao) \
-      .add_product_review(review_data, MovieReview, 'movie_id' )
+      .add_product_review(review_data, MovieReview)
   
   @staticmethod
   def get_ratings() -> list[tuple]:
     return super(MovieReviewDao, MovieReviewDao) \
-      .get_product_ratings(MovieReview, MovieReview.movie_id)
+      .get_product_ratings(MovieReview)
 
   @staticmethod
   def get_by_id(rid: str) -> ReviewType:
@@ -54,12 +50,12 @@ class BookReviewDao(ReviewDao):
   @staticmethod
   def add_new(review_data: ReviewType) -> bool:
     return super(BookReviewDao, BookReviewDao) \
-      .add_product_review(review_data, BookReview, 'book_id')
+      .add_product_review(review_data, BookReview)
   
   @staticmethod
   def get_ratings() -> list[tuple]:
     return super(BookReviewDao, BookReviewDao) \
-      .get_product_ratings(BookReview, BookReview.book_id)
+      .get_product_ratings(BookReview)
 
   @staticmethod
   def get_by_id(rid: str) -> ReviewType:
@@ -70,12 +66,12 @@ class ShowReviewDao(ReviewDao):
   @staticmethod
   def add_new(review_data: ReviewType) -> bool:
     return super(ShowReviewDao, ShowReviewDao) \
-    .add_product_review(review_data, ShowReview, 'show_id')
+    .add_product_review(review_data, ShowReview)
   
   @staticmethod
   def get_ratings() -> list[tuple]:
     return super(ShowReviewDao, ShowReviewDao) \
-      .get_product_ratings(ShowReview, ShowReview.show_id)
+      .get_product_ratings(ShowReview)
 
   @staticmethod
   def get_by_id(rid: str) -> ReviewType:

@@ -4,6 +4,7 @@ from dao.dao import Dao
 from db.database import db
 from db.models import Book, MediaProduct, Movie, Genre, Show, product_genres
 from db.structs import BookType, MovieType, ShowType
+from dao.review_mapper import get_reviews
 
 class ProductDao(Dao):
   @staticmethod
@@ -45,18 +46,11 @@ class ProductDao(Dao):
     return (result, common)
   
   @staticmethod
-  def get_reviews(pid: str, model: db.Model, attr: str):
+  def get_product_reviews(pid: str, model: db.Model) -> list[dict]:
     result = super(ProductDao, ProductDao).get_by_id(model, pid)
     if result is None: return result
-    return [{
-      'text': r.text,
-      'rate': r.rate,
-      'author': r.user.name,
-      'author_id': r.user_id,
-      'product': getattr(r, attr).product.title,
-      'product_id': getattr(r, f'{attr}_id')
-    } for r in result.reviews]
-    
+    return get_reviews(result.reviews)
+
   def __insert_new_genres(genres: list[str]) -> list[dict]:
     result = list()
     for genre_name in genres:
@@ -91,6 +85,11 @@ class MovieDao(ProductDao):
       **common
     }
 
+  @staticmethod
+  def get_reviews(pid: str) -> list[dict]:
+    return super(MovieDao, MovieDao) \
+      .get_product_reviews(pid, Movie)
+
 class BookDao(ProductDao):
   @staticmethod
   def add_new(book_data: BookType) -> bool:
@@ -111,6 +110,11 @@ class BookDao(ProductDao):
       **common
     }
 
+  @staticmethod
+  def get_reviews(pid: str) -> list[dict]:
+    return super(BookDao, BookDao) \
+      .get_product_reviews(pid, Book)
+
 class ShowDao(ProductDao):
   @staticmethod
   def add_new(show_data: ShowType) -> bool:
@@ -130,3 +134,8 @@ class ShowDao(ProductDao):
       'episodes': result.episodes,
       **common
     }
+
+  @staticmethod
+  def get_reviews(pid: str) -> list[dict]:
+    return super(ShowDao, ShowDao) \
+      .get_product_reviews(pid, Show)

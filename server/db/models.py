@@ -82,11 +82,11 @@ class User(StrIdMixin, db.Model):
 
 class MovieReview(ReviewMixin, db.Model):
   __tablename__ = 'movie_reviews'
-  movie_id = db.Column(
+  product_id = db.Column(
     db.String(22),
     db.ForeignKey('movies.id')
   )
-  movie = db.relationship(
+  product = db.relationship(
     'Movie',
     back_populates='reviews',
     uselist=False
@@ -110,7 +110,7 @@ class ShowReview(ReviewMixin, db.Model):
     db.String(22),
     db.ForeignKey('shows.id')
   )
-  show = db.relationship(
+  product = db.relationship(
     'Show',
     back_populates='reviews',
     uselist=False
