@@ -1,7 +1,7 @@
 import bcrypt
 from sqlalchemy.orm import validates
 from sqlalchemy.ext.hybrid import hybrid_property
-from db.database import db
+from extensions import db
 from db.mixins import *
 
 product_genres = db.Table(

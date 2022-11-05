@@ -3,6 +3,7 @@ from flask import request, Blueprint
 from dao.userDao import UserDao
 from http import HTTPStatus
 from apps.utils import err_response, date_formater, check_missing_fields
+from apps.routes_writer import register_routes
 
 user = Blueprint('user', __name__)
 
@@ -18,7 +19,6 @@ def get_reviews(request: Request, type: str) -> tuple[dict, int]:
     HTTPStatus.NOT_FOUND
   )
 
-@user.route('/user/profile', methods=['POST'])
 @date_formater
 def profile() -> tuple[dict, int]:
   data = request.get_json()
@@ -34,14 +34,11 @@ def profile() -> tuple[dict, int]:
   del user['password']
   return {**user, 'my_page': my_page}, HTTPStatus.OK
 
-@user.route('/user/movie-reviews', methods=['POST'])
-def movie_reviews() -> tuple[dict, int]:
-  return get_reviews(request, 'movie')
+routes_fns = {
+  '/user/profile': profile,
+  '/user/movie-reviews': lambda: get_reviews(request, 'movie'),
+  '/user/book-reviews': lambda: get_reviews(request, 'book'),
+  '/user/show-reviews': lambda: get_reviews(request, 'show')
+}
 
-@user.route('/user/book-reviews', methods=['POST'])
-def book_reviews() -> tuple[dict, int]:
-  return get_reviews(request, 'book')
-
-@user.route('/user/show-reviews', methods=['POST'])
-def show_reviews() -> tuple[dict, int]:
-  return get_reviews(request, 'show')
+register_routes(user, routes_fns)

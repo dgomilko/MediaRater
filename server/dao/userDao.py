@@ -1,5 +1,5 @@
 from dao.dao import Dao
-from db.database import db
+from extensions import db
 from db.models import User
 from db.structs import UserType
 from dao.review_mapper import get_reviews

@@ -1,9 +1,8 @@
 from dataclasses import dataclass
 from sqlalchemy.exc import IntegrityError
 from dao.dao import Dao
-from db.database import db
-from db.models import Book, MediaProduct, Movie, Genre, Show, product_genres
-from db.structs import BookType, MovieType, ShowType
+from extensions import db
+from db.models import *
 from dao.review_mapper import get_reviews
 
 class ProductDao(Dao):
@@ -65,77 +64,44 @@ class ProductDao(Dao):
       result.append({'name': genre.name, 'id': genre.id})
     return result
 
-class MovieDao(ProductDao):
-  @staticmethod
-  def add_new(film_data: MovieType) -> bool:
-    specific_args = {
-      'runtime': film_data.runtime,
-      'director': film_data.director
-    }
-    return super(MovieDao, MovieDao) \
-      .add_product(film_data, Movie, specific_args)
+# import types
+# import functools
 
-  @staticmethod
+# def copy_func(f):
+#     """Based on http://stackoverflow.com/a/6528148/190597 (Glenn Maynard)"""
+#     g = types.FunctionType(f.__code__, f.__globals__, name=f.__name__,
+#                            argdefs=f.__defaults__,
+#                            closure=f.__closure__)
+#     g = functools.update_wrapper(g, f)
+#     g.__kwdefaults__ = f.__kwdefaults__
+#     return g
+
+def product_dao_factory(
+  name: str,
+  specific_args: list[str],
+  model: db.Model
+):
+  def add_new(data: dataclass) -> bool:
+    speial_values = {key: getattr(data, key) for key in specific_args}
+    return ProductDao.add_product(data, model, speial_values)
+
   def get_by_id(pid: str) -> dict:
-    result, common = super(MovieDao, MovieDao) \
-      .get_product_by_id(pid, Movie)
+    result, common = ProductDao.get_product_by_id(pid, model)
     return result if result is None else {
-      'runtime': result.runtime,
-      'director': result.director,
+      **{key: getattr(result, key) for key in specific_args},
       **common
     }
 
-  @staticmethod
   def get_reviews(pid: str) -> list[dict]:
-    return super(MovieDao, MovieDao) \
-      .get_product_reviews(pid, Movie)
+    return ProductDao.get_product_reviews(pid, model)
 
-class BookDao(ProductDao):
-  @staticmethod
-  def add_new(book_data: BookType) -> bool:
-    specific_args = {
-      'pages': book_data.pages,
-      'author': book_data.author
-    }
-    return super(BookDao, BookDao) \
-      .add_product(book_data, Book, specific_args)
+  methods = {
+    'add_new': staticmethod(add_new),
+    'get_by_id': staticmethod(get_by_id),
+    'get_reviews': staticmethod(get_reviews)
+  }
+  return type(name, (ProductDao,), methods)
 
-  @staticmethod
-  def get_by_id(pid: str) -> dict:
-    result, common = super(BookDao, BookDao) \
-      .get_product_by_id(pid, Book)
-    return result if result is None else {
-      'pages': result.pages,
-      'author': result.author,
-      **common
-    }
-
-  @staticmethod
-  def get_reviews(pid: str) -> list[dict]:
-    return super(BookDao, BookDao) \
-      .get_product_reviews(pid, Book)
-
-class ShowDao(ProductDao):
-  @staticmethod
-  def add_new(show_data: ShowType) -> bool:
-    specific_args = {
-      'seasons': show_data.seasons,
-      'episodes': show_data.episodes
-    }
-    return super(ShowDao, ShowDao) \
-      .add_product(show_data, Show, specific_args)
-
-  @staticmethod
-  def get_by_id(pid: str) -> ShowType:
-    result, common = super(ShowDao, ShowDao) \
-      .get_product_by_id(pid, Show)
-    return result if result is None else {
-      'seasons': result.seasons,
-      'episodes': result.episodes,
-      **common
-    }
-
-  @staticmethod
-  def get_reviews(pid: str) -> list[dict]:
-    return super(ShowDao, ShowDao) \
-      .get_product_reviews(pid, Show)
+MovieDao = product_dao_factory('MovieDao', ['runtime', 'director'], Movie)
+BookDao = product_dao_factory('BookDao', ['pages', 'author'], Book)
+ShowDao = product_dao_factory('ShowDao', ['seasons', 'episodes'], Show)

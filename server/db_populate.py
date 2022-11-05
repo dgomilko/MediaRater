@@ -7,7 +7,7 @@ from dao.review_daos import *
 from db.structs import *
 from db.models import *
 
-LIMIT = 20
+LIMIT = 100
 MOVIES_PATH = './media_data/movies.csv'
 BOOKS_PATH = './media_data/books.csv'
 SHOWS_PATH = './media_data/shows.csv'
@@ -44,6 +44,30 @@ users = [
     birthday='2001.12.11',
     password='asdkl34jk',
     gender='f'
+  ),
+  UserType(
+    name='user5',
+    email='ad_fds__e@gmail.com',
+    country='Ukraine',
+    birthday='2000.12.11',
+    password='asdkl34jk',
+    gender='f'
+  ),
+  UserType(
+    name='user6',
+    email='ad_fds_d_e@gmail.com',
+    country='Ukraine',
+    birthday='2000.12.11',
+    password='asdkl34jk',
+    gender='m'
+  ),
+  UserType(
+    name='user7',
+    email='afds_d_e@gmail.com',
+    country='Ukraine',
+    birthday='2000.12.11',
+    password='asdkl34jk',
+    gender='m'
   )
 ]
 
@@ -74,7 +98,7 @@ def populate_reviews(
 ):
   for user in users:
     db_user = User.query.filter_by(name=user.name).first()
-    reiewed_products = sample(products, randint(0, 10))
+    reiewed_products = sample(products, randint(0, 50))
     for product in reiewed_products:
       db_product = product_model.query.join(MediaProduct) \
         .filter_by(title=product.title).first()

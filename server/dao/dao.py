@@ -1,6 +1,5 @@
-from dataclasses import dataclass
-from db.database import db
 from sqlalchemy.exc import SQLAlchemyError
+from extensions import db
 
 class Dao():
 

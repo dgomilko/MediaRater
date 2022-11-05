@@ -1,27 +1,32 @@
 from flask import Flask
-from db.models import db
+from extensions import db, celery
 from db_populate import populate_db
-from recommend import *
+# from apps.recommend.recommender_task import *
 from dao.review_daos import MovieReviewDao
 from dao.userDao import UserDao
 from dao.product_daos import MovieDao
 from apps.authenticate.views import authenticate
 from apps.user.views import user
 from apps.product.views import product
+from apps.recommend.views import recommend
 
-# @app.route('/')
-# def index():
-#   return jsonify({"message":"Welcome to my site"})
-
-def create_app() -> Flask:
-  apps = [authenticate, user, product]
-  app = Flask(__name__)
-  app.config.from_object('config.DevelopmentConfig')
+def init_db(app):
   db.app = app
   db.init_app(app)
   db.create_all()
+
+def init_celery(app):
+  celery.config_from_object('config.DevelopmentConfig', namespace='CELERY')
+
+def create_app() -> Flask:
+  apps = [authenticate, user, product, recommend]
+  app = Flask(__name__)
+  app.config.from_object('config.DevelopmentConfig')
+  # init_celery(app)
+  init_db(app)
   # populate_db()
   for bp in apps: app.register_blueprint(bp)
   return app
 
-create_app().run()
+if __name__ == '__main__':
+  create_app().run()

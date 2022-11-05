@@ -1,6 +1,6 @@
 from sqlalchemy.orm import declared_attr
 from utils import generate_key
-from db.database import db
+from extensions import db
 
 class IntIdMixin(object):
   id = db.Column(db.Integer, primary_key=True)

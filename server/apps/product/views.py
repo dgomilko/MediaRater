@@ -2,7 +2,8 @@ from urllib.request import Request
 from flask import request, Blueprint
 from dao.product_daos import BookDao, MovieDao, ProductDao, ShowDao
 from http import HTTPStatus
-from apps.utils import err_response, date_formater, check_missing_fields
+from apps.utils import err_response
+from apps.routes_writer import register_routes
 
 product = Blueprint('product', __name__)
 
@@ -28,26 +29,13 @@ def reviews(request: Request, dao: ProductDao):
     HTTPStatus.NOT_FOUND
   )
 
-@product.route('/product/movie-desc', methods=['POST'])
-def movie_desc():
-  return description(request, MovieDao)
-  
-@product.route('/product/book-desc', methods=['POST'])
-def book_desc():
-  return description(request, BookDao)
+routes_fns = {
+  '/product/movie-desc': lambda: description(request, MovieDao),
+  '/product/book-desc': lambda: description(request, BookDao),
+  '/product/show-desc': lambda: description(request, ShowDao),
+  '/product/movie-reviews': lambda: reviews(request, MovieDao),
+  '/product/book-reviews': lambda: reviews(request, BookDao),
+  '/product/show-reviews': lambda: reviews(request, ShowDao)
+}
 
-@product.route('/product/show-desc', methods=['POST'])
-def show_desc():
-  return description(request, ShowDao)
-
-@product.route('/product/movie-reviews', methods=['POST'])
-def movie_reviews():
-  return reviews(request, MovieDao)
-
-@product.route('/product/show-reviews', methods=['POST'])
-def show_reviews():
-  return reviews(request, ShowDao)
-
-@product.route('/product/book-reviews', methods=['POST'])
-def book_reviews():
-  return reviews(request, BookDao)
+register_routes(product, routes_fns)
