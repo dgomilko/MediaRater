@@ -22,13 +22,17 @@ class UserDao(Dao):
   @staticmethod
   def get_by_id(uid: str) -> dict:
     result = super(UserDao, UserDao).get_by_id(User, uid)
-    return UserDao.__user_as_dict(result)
+    return UserDao.__user_as_dict(result) if result is not None else None
 
   @staticmethod
   def get_reviews(uid: str, attr: str) -> list[dict]:
     result = super(UserDao, UserDao).get_by_id(User, uid)
     if result is None: return result
     return get_reviews(getattr(result, f'{attr}_reviews'))
+
+  @staticmethod
+  def get_ids() -> list[str]:
+    return [x[0] for x in User.query.with_entities(User.id).all()]
     
   __user_as_dict = lambda result: {
       'name': result.name,

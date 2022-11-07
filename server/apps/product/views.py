@@ -7,7 +7,7 @@ from apps.routes_writer import register_routes
 
 product = Blueprint('product', __name__)
 
-def description(request: Request, dao: ProductDao):
+def description(request: Request, dao: ProductDao) -> tuple[dict, int]:
   data = request.get_json()
   if not 'id' in data.keys():
     return err_response('Invalid data', HTTPStatus.BAD_REQUEST)
@@ -18,7 +18,7 @@ def description(request: Request, dao: ProductDao):
     HTTPStatus.NOT_FOUND
   )
 
-def reviews(request: Request, dao: ProductDao):
+def reviews(request: Request, dao: ProductDao) -> tuple[dict, int]:
   data = request.get_json()
   if not 'id' in data.keys():
     return err_response('Invalid data', HTTPStatus.BAD_REQUEST)

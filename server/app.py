@@ -1,10 +1,5 @@
 from flask import Flask
-from extensions import db, celery
-from db_populate import populate_db
-# from apps.recommend.recommender_task import *
-from dao.review_daos import MovieReviewDao
-from dao.userDao import UserDao
-from dao.product_daos import MovieDao
+from extensions import db
 from apps.authenticate.views import authenticate
 from apps.user.views import user
 from apps.product.views import product
@@ -15,14 +10,10 @@ def init_db(app):
   db.init_app(app)
   db.create_all()
 
-def init_celery(app):
-  celery.config_from_object('config.DevelopmentConfig', namespace='CELERY')
-
 def create_app() -> Flask:
   apps = [authenticate, user, product, recommend]
   app = Flask(__name__)
   app.config.from_object('config.DevelopmentConfig')
-  # init_celery(app)
   init_db(app)
   # populate_db()
   for bp in apps: app.register_blueprint(bp)

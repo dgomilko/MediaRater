@@ -50,6 +50,10 @@ class ProductDao(Dao):
     if result is None: return result
     return get_reviews(result.reviews)
 
+  @staticmethod
+  def get_all_ids(model: db.Model) -> list[str]:
+    return model.query.with_entities(model.id).all()
+
   def __insert_new_genres(genres: list[str]) -> list[dict]:
     result = list()
     for genre_name in genres:
@@ -63,18 +67,6 @@ class ProductDao(Dao):
         genre = Genre.query.filter_by(name=genre_name).first()
       result.append({'name': genre.name, 'id': genre.id})
     return result
-
-# import types
-# import functools
-
-# def copy_func(f):
-#     """Based on http://stackoverflow.com/a/6528148/190597 (Glenn Maynard)"""
-#     g = types.FunctionType(f.__code__, f.__globals__, name=f.__name__,
-#                            argdefs=f.__defaults__,
-#                            closure=f.__closure__)
-#     g = functools.update_wrapper(g, f)
-#     g.__kwdefaults__ = f.__kwdefaults__
-#     return g
 
 def product_dao_factory(
   name: str,
@@ -95,10 +87,14 @@ def product_dao_factory(
   def get_reviews(pid: str) -> list[dict]:
     return ProductDao.get_product_reviews(pid, model)
 
+  def get_ids() -> list[dict]:
+    return [x[0] for x in ProductDao.get_all_ids(model)]
+
   methods = {
     'add_new': staticmethod(add_new),
     'get_by_id': staticmethod(get_by_id),
-    'get_reviews': staticmethod(get_reviews)
+    'get_reviews': staticmethod(get_reviews),
+    'get_ids': staticmethod(get_ids)
   }
   return type(name, (ProductDao,), methods)
 
