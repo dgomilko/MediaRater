@@ -7,7 +7,4 @@ def generate_key() -> str:
   repl = lambda m: {'+': '-', '/': '_', '=': ''}[m.group(0)]
   pattern = r'[\=\+\/]'
   return sub(pattern, repl, rv)
-
-# import pandas as pd
-
-# print(pd.read_csv('./media_data/shows.csv').T.to_dict())
+  

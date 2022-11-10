@@ -2,14 +2,12 @@ from sqlalchemy.exc import SQLAlchemyError
 from extensions import db
 
 class Dao():
-
   @staticmethod
   def commit() -> bool:
     try:
       db.session.commit()
       return True
-    except SQLAlchemyError as e:
-      print(e)
+    except SQLAlchemyError:
       db.session.rollback()
       return False
 

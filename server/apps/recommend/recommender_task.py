@@ -2,9 +2,10 @@ import numpy as np
 import lightfm as lf
 from scipy.sparse import coo_matrix
 from extensions import celery
-from dao.review_daos import *
-from dao.product_daos import *
-from dao.userDao import UserDao
+from dao.review.review_daos import *
+from dao.product.product_daos import *
+from dao.product.ProductDao import ProductDao
+from dao.user.userDao import UserDao
 
 @celery.task()
 def get_recommendations(
@@ -38,10 +39,15 @@ def get_recommendations(
   ids = lookup_pid[indices]
   return ids_to_info(ids, product_dao)
 
-def create_matrix(lookups, dims, rates):
+def create_matrix(
+  lookups: tuple[np.ndarray],
+  dims: tuple[int],
+  rates: np.ndarray
+) -> np.ndarray:
+  map_ids = lambda lookup, arr: [np.where(lookup == x)[0][0] for x in arr]
   int_rates = np.vstack(np.array((
-    [np.where(lookups[0] == x)[0][0] for x in rates[:,1]],
-    [np.where(lookups[1] == x)[0][0] for x in rates[:,0]],
+    map_ids(lookups[0], rates[:,1]),
+    map_ids(lookups[1], rates[:,0]),
     [1 if int(x) > 3 else -1 for x in rates[:,2]])
   ).T)
   matrix = np.zeros(dims)
@@ -50,7 +56,7 @@ def create_matrix(lookups, dims, rates):
 
 def ids_to_info(ids: list[str], dao: ProductDao) -> list[dict]:
   full_info = [dao.get_by_id(id) for id in ids]
-  keys_to_preserve = ['title', 'release', 'img_path']
+  keys_to_preserve = ['id', 'title', 'release', 'img_path']
   remove_except = lambda d: {
     k: v for k, v in d.items() if k in keys_to_preserve
   }

@@ -1,10 +1,6 @@
 import os
 from dotenv import load_dotenv
 
-# Sets the base directory path
-# basedir = os.path.abspath(os.path.dirname(__file__))
-
-# loads the environment variable file
 load_dotenv()
 
 default_params = {
@@ -12,7 +8,9 @@ default_params = {
 	'DB_PORT': 5432,
 	'DB_USER': 'postgres',
 	'DB_PASSWORD': '',
-	'DB_NAME': 'postgres'
+	'DB_NAME': 'postgres',
+	'TOKEN_EXP_MINS': 45,
+	'REDIS_URL': 'redis://:localhost:6379/0'
 }
 
 def load_env(name):
@@ -27,8 +25,10 @@ DB_URL = (f'postgresql+psycopg2://'
 class Config():
 	SQLALCHEMY_DATABASE_URI = DB_URL
 	SQLALCHEMY_TRACK_MODIFICATIONS = False
-	CELERY_BROKER_URL = 'redis://:redis-passwd0123@localhost:6379/0'
-	CELERY_RESULT_BACKEND = 'redis://:redis-passwd0123@localhost:6379/0'
+	SECRET_KEY = os.environ['SECRET_KEY']
+	CELERY_BROKER_URL = load_env('REDIS_URL')
+	CELERY_RESULT_BACKEND = load_env('REDIS_URL')
+	TOKEN_EXP_MINS = load_env('TOKEN_EXP_MINS')
 
 class DevelopmentConfig(Config):
 	ENV = 'development'

@@ -1,5 +1,5 @@
 from sqlalchemy.orm import declared_attr
-from utils import generate_key
+from security_utils.id_gen import generate_key
 from extensions import db
 
 class IntIdMixin(object):
@@ -34,7 +34,8 @@ class ProductMixin(StrIdMixin, object):
     name = cls.__name__
     return db.relationship(
       f'{name}Review',
-      back_populates='product'
+      back_populates='product',
+      lazy='dynamic'
     )
 
 class ReviewMixin(IntIdMixin, object):

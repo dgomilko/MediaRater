@@ -3,11 +3,16 @@ from sqlalchemy.exc import IntegrityError
 from dao.dao import Dao
 from extensions import db
 from db.models import *
-from dao.review_mapper import get_reviews
+from dao.model_mappers import *
+from dao.reviews_loader import limit_per_page
 
 class ProductDao(Dao):
   @staticmethod
-  def add_product(product_data: dataclass, model: db.Model, args: dict) -> bool:
+  def add_product(
+    product_data: dataclass,
+    model: db.Model,
+    args: dict
+  ) -> bool:
     product = MediaProduct(
       title=product_data.title,
       release=product_data.release,
@@ -34,25 +39,37 @@ class ProductDao(Dao):
   @staticmethod
   def get_product_by_id(pid: str, model: db.Model) -> tuple[any, dict]:
     result = super(ProductDao, ProductDao).get_by_id(model, pid)
-    if result is None: return (None, None)
-    common = {
-      'title': result.product.title,
-      'release': result.product.release,
-      'img_path': result.product.img_path,
-      'synopsis': result.product.synopsis,
-      'genres': [genre.name for genre in result.product.genres],
-    }
+    if not result: return (None, None)
+    common = product_mapper(result)
     return (result, common)
   
   @staticmethod
-  def get_product_reviews(pid: str, model: db.Model) -> list[dict]:
+  @limit_per_page(10)
+  def get_product_reviews(
+    pid: str,
+    page: int,
+    model: db.Model
+  ) -> tuple[list[dict], bool]:
     result = super(ProductDao, ProductDao).get_by_id(model, pid)
-    if result is None: return result
-    return get_reviews(result.reviews)
+    return result.reviews if result else None
 
   @staticmethod
   def get_all_ids(model: db.Model) -> list[str]:
     return model.query.with_entities(model.id).all()
+
+  @staticmethod
+  def load_products(page: int, model: db.Model) -> list[dict]:
+    results_per_page = 20
+    offset = results_per_page * (page - 1)
+    limit = results_per_page * page
+    result = model.query.slice(offset, limit).all()
+    if not result: return None
+    return [product_short_mapper(r) for r in result]
+
+  @staticmethod
+  def get_stats(pid: str, model: db.Model) -> list[dict]:
+    result = super(ProductDao, ProductDao).get_by_id(model, pid)
+    return stats_mapper(result.reviews) if result else None
 
   def __insert_new_genres(genres: list[str]) -> list[dict]:
     result = list()
@@ -67,37 +84,3 @@ class ProductDao(Dao):
         genre = Genre.query.filter_by(name=genre_name).first()
       result.append({'name': genre.name, 'id': genre.id})
     return result
-
-def product_dao_factory(
-  name: str,
-  specific_args: list[str],
-  model: db.Model
-):
-  def add_new(data: dataclass) -> bool:
-    speial_values = {key: getattr(data, key) for key in specific_args}
-    return ProductDao.add_product(data, model, speial_values)
-
-  def get_by_id(pid: str) -> dict:
-    result, common = ProductDao.get_product_by_id(pid, model)
-    return result if result is None else {
-      **{key: getattr(result, key) for key in specific_args},
-      **common
-    }
-
-  def get_reviews(pid: str) -> list[dict]:
-    return ProductDao.get_product_reviews(pid, model)
-
-  def get_ids() -> list[dict]:
-    return [x[0] for x in ProductDao.get_all_ids(model)]
-
-  methods = {
-    'add_new': staticmethod(add_new),
-    'get_by_id': staticmethod(get_by_id),
-    'get_reviews': staticmethod(get_reviews),
-    'get_ids': staticmethod(get_ids)
-  }
-  return type(name, (ProductDao,), methods)
-
-MovieDao = product_dao_factory('MovieDao', ['runtime', 'director'], Movie)
-BookDao = product_dao_factory('BookDao', ['pages', 'author'], Book)
-ShowDao = product_dao_factory('ShowDao', ['seasons', 'episodes'], Show)

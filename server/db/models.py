@@ -1,7 +1,8 @@
-import bcrypt
 from sqlalchemy.orm import validates
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.sql import func
 from extensions import db
+from security_utils.passwd_encryption import encrypt_passwd
 from db.mixins import *
 
 product_genres = db.Table(
@@ -55,15 +56,18 @@ class User(StrIdMixin, db.Model):
   gender = db.Column(db.String(1))
   movie_reviews = db.relationship(
     'MovieReview',
-    back_populates='user'
+    back_populates='user',
+    lazy='dynamic'
   )
   book_reviews = db.relationship(
     'BookReview',
-    back_populates='user'
+    back_populates='user',
+    lazy='dynamic'
   )
   show_reviews = db.relationship(
     'ShowReview',
-    back_populates='user'
+    back_populates='user',
+    lazy='dynamic'
   )
 
   @validates('gender')
@@ -77,8 +81,7 @@ class User(StrIdMixin, db.Model):
 
   @password.setter
   def password(self, password):
-    pwhash = bcrypt.hashpw(password.encode('utf8'), bcrypt.gensalt())
-    self._password = pwhash.decode('utf8')
+    self._password = encrypt_passwd(password)
 
 class MovieReview(ReviewMixin, db.Model):
   __tablename__ = 'movie_reviews'
@@ -114,4 +117,13 @@ class ShowReview(ReviewMixin, db.Model):
     'Show',
     back_populates='reviews',
     uselist=False
+  )
+
+class BlacklistedToken(IntIdMixin, db.Model):
+  __tablename__ = 'blacklisted_tokens'
+  token = db.Column(db.String(500), unique=True, nullable=False)
+  blacklisted_date = db.Column(
+    db.DateTime,
+    nullable=False,
+    default=func.now()
   )

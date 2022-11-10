@@ -4,6 +4,8 @@ from apps.authenticate.views import authenticate
 from apps.user.views import user
 from apps.product.views import product
 from apps.recommend.views import recommend
+from apps.products_list.views import products_list
+from db_populate import populate_db
 
 def init_db(app):
   db.app = app
@@ -11,7 +13,7 @@ def init_db(app):
   db.create_all()
 
 def create_app() -> Flask:
-  apps = [authenticate, user, product, recommend]
+  apps = [authenticate, user, product, recommend, products_list]
   app = Flask(__name__)
   app.config.from_object('config.DevelopmentConfig')
   init_db(app)

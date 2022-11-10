@@ -1,40 +1,52 @@
-import bcrypt
 from http import HTTPStatus
 from flask import request, Blueprint
 from db.structs import UserType
-from dao.userDao import UserDao
-from apps.utils import err_response, date_formater, check_missing_fields
+from dao.user.userDao import UserDao
+from apps.decorators import *
+from apps.err_messages import *
+from dao.token.tokenDao import TokenDao
+from security_utils.tokens import encode_token
+from security_utils.passwd_encryption import check_passwd
 
 authenticate = Blueprint('authenticate', __name__)
-
+ 
 @authenticate.route("/register", methods=['POST'])
+@expected_fields(['name', 'email', 'password', 'birthday', 'country', 'gender'])
 def register() -> tuple[dict, int]:
   user_data = request.get_json()
-  err = err_response('Invalid data', HTTPStatus.BAD_REQUEST)
-  expected_fields = ['name', 'email', 'password', 'birthday', 'country', 'gender']
-  missing_fields = check_missing_fields(user_data, expected_fields)
-  if missing_fields: return err
   email_taken = UserDao.get_by_email(user_data['email']) is not None
   if email_taken:
-    return err_response('Email alredy taken', HTTPStatus.BAD_REQUEST)
+    return err_response(ErrMsg.EMAIL_TAKEN, HTTPStatus.BAD_REQUEST)
   added_user = UserDao.add_user(UserType(**user_data))
-  return added_user, HTTPStatus.CREATED if added_user is not None else err
+  if not added_user:
+    return err_response(ErrMsg.INVALID, HTTPStatus.BAD_REQUEST)
+  token = encode_token(added_user['id'])
+  return {**added_user, 'token': token}, HTTPStatus.CREATED
 
 @authenticate.route('/login', methods = ['POST'])
+@expected_fields(['email', 'password'])
 @date_formater
 def login() -> tuple[dict, int]:
   user_data = request.get_json()
-  expected_fields = ['email', 'password']
-  missing_fields = check_missing_fields(user_data, expected_fields)
-  if missing_fields:
-    return err_response('Invalid data', HTTPStatus.BAD_REQUEST)
   found_user = UserDao.get_by_email(user_data['email'])
-  if found_user is None:
-    return err_response('User does not exist', HTTPStatus.NOT_FOUND)
-  print(user_data['password'], found_user['password'])
-  passwd_encoded = [p['password'].encode('utf-8') for p in [user_data, found_user]]
-  password_correct = bcrypt.checkpw(*passwd_encoded)
+  if not found_user:
+    return err_response(ErrMsg.UNKNOWN_EMAIL, HTTPStatus.NOT_FOUND)
+  passwds = [p['password'] for p in [user_data, found_user]]
+  password_correct = check_passwd(*passwds)
   if not password_correct:
-    return err_response('Invalid password', HTTPStatus.BAD_REQUEST)
+    return err_response(ErrMsg.WRONG_PASSWD, HTTPStatus.BAD_REQUEST)
   del found_user['password']
-  return found_user, HTTPStatus.OK
+  token = encode_token(found_user['id'])
+  return {**found_user, 'token': token}, HTTPStatus.OK
+
+@authenticate.route('/logout', methods = ['POST'])
+@authorization_needed
+def logout():
+  auth_header = request.headers.get('Authorization')
+  token = auth_header.split(' ')[1]
+  blacklisted = TokenDao.blacklist(token)
+  if not blacklisted: return err_response(
+    ErrMsg.LOGOUT_ERROR,
+    HTTPStatus.INTERNAL_SERVER_ERROR
+  )
+  return {'status': 'success'}, HTTPStatus.OK
