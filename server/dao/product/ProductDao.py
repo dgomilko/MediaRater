@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from sqlalchemy.exc import IntegrityError
 from dao.dao import Dao
 from extensions import db
@@ -9,21 +8,22 @@ from dao.reviews_loader import limit_per_page
 class ProductDao(Dao):
   @staticmethod
   def add_product(
-    product_data: dataclass,
+    product_data: dict,
     model: db.Model,
     args: dict
   ) -> bool:
     product = MediaProduct(
-      title=product_data.title,
-      release=product_data.release,
-      synopsis=product_data.synopsis,
-      img_path=product_data.img_path
+      title=product_data['title'],
+      release=product_data['release'],
+      synopsis=product_data['synopsis'],
+      img_path=product_data['img_path']
     )
     subproduct = model(product=product, **args)
-    if not product_data.genres:
+    genres = product_data['genres']
+    if not genres:
       db.session.add(subproduct)
       return super(ProductDao, ProductDao).commit()
-    genres = ProductDao.__insert_new_genres(product_data.genres)
+    genres = ProductDao.__insert_new_genres(genres)
     db.session.add(subproduct)
     db.session.flush()
     for genre in genres:

@@ -6,20 +6,25 @@ from dao.review.ReviewDao import ReviewDao
 from dao.review.review_daos import *
 from apps.routes_writer import register_routes
 from apps.err_messages import *
-from apps.decorators import expected_fields
-from db.structs import ReviewType
+from apps.decorators import authorization_needed, expected_fields
+from dao.user.userDao import UserDao
 
 product = Blueprint('product', __name__)
 
-@expected_fields(['id'])
-def description(dao: ProductDao) -> tuple[dict, int]:
-  pid = request.get_json()['id']
-  found_product = dao.get_by_id(pid)
-  valid_res = found_product, HTTPStatus.OK
-  return valid_res if found_product else err_response(
-    ErrMsg.NO_CONTENT,
-    HTTPStatus.NOT_FOUND
-  )
+@expected_fields(['id', 'user_id'])
+def description(
+  review_dao: ReviewDao,
+  product_dao: ProductDao
+) -> tuple[dict, int]:
+  data = request.get_json()
+  pid = data['id']
+  found_product = product_dao.get_by_id(pid)
+  if not found_product:
+    return err_response(ErrMsg.NO_CONTENT, HTTPStatus.NOT_FOUND)
+  reviewed = review_dao.reviewed(data['user_id'], pid)
+  rate = reviewed['rate'] if reviewed else None
+  valid_res = {**found_product, 'reviewed': rate}, HTTPStatus.OK
+  return valid_res
 
 @expected_fields(['id'])
 def get_stats(dao: ProductDao) -> tuple[dict, int]:
@@ -41,22 +46,30 @@ def reviews(dao: ProductDao) -> tuple[dict, int]:
   return {'reviews': reviews, 'next_available': next_available} 
 
 @expected_fields(['rate', 'user_id', 'product_id'])
-def add_review(dao: ReviewDao):
+@authorization_needed
+def add_review(review_dao: ReviewDao, product_dao: ProductDao):
   data = request.get_json()
-  added = dao.add_new(ReviewType(**data))
-  print(added, HTTPStatus.CREATED if added else err_response(
-    ErrMsg.INVALID,
-    HTTPStatus.BAD_REQUEST
-  ))
+  uid = data['user_id']
+  pid = data['product_id']
+  user_exists = UserDao.get_by_id(uid)
+  if not user_exists:
+    return err_response(ErrMsg.NO_USER, HTTPStatus.NOT_FOUND)
+  product_exists = product_dao.get_by_id(pid)
+  if not product_exists:
+    return err_response(ErrMsg.NO_PRODUCT, HTTPStatus.NOT_FOUND)
+  already_reviewed = review_dao.reviewed(uid, pid)
+  if already_reviewed:
+    return err_response(ErrMsg.REVIEWED, HTTPStatus.FORBIDDEN)
+  added = review_dao.add_new(data)
   return (added, HTTPStatus.CREATED) if added else err_response(
     ErrMsg.INVALID,
     HTTPStatus.BAD_REQUEST
   )
 
 routes_fns = {
-  '/product/movie-desc': lambda: description(MovieDao),
-  '/product/book-desc': lambda: description(BookDao),
-  '/product/show-desc': lambda: description(ShowDao),
+  '/product/movie-desc': lambda: description(MovieReviewDao, MovieDao),
+  '/product/book-desc': lambda: description(BookReviewDao, BookDao),
+  '/product/show-desc': lambda: description(BookReviewDao, BookDao),
 
   '/product/movie-reviews': lambda: reviews(MovieDao),
   '/product/book-reviews': lambda: reviews(BookDao),
@@ -66,9 +79,9 @@ routes_fns = {
   '/product/book-stats': lambda: get_stats(BookDao),
   '/product/show-stats': lambda: get_stats(ShowDao),
 
-  '/product/new-movie-review': lambda: add_review(MovieReviewDao),
-  '/product/new-book-review': lambda: add_review(BookReviewDao),
-  '/product/new-show-review': lambda: add_review(ShowReviewDao),
+  '/product/new-movie-review': lambda: add_review(MovieReviewDao, MovieDao),
+  '/product/new-book-review': lambda: add_review(BookReviewDao, BookDao),
+  '/product/new-show-review': lambda: add_review(ShowReviewDao, ShowDao),
 }
 
 register_routes(product, routes_fns)

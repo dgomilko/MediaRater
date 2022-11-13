@@ -1,6 +1,5 @@
 from http import HTTPStatus
 from flask import request, Blueprint
-from db.structs import UserType
 from dao.user.userDao import UserDao
 from apps.decorators import *
 from apps.err_messages import *
@@ -17,7 +16,7 @@ def register() -> tuple[dict, int]:
   email_taken = UserDao.get_by_email(user_data['email']) is not None
   if email_taken:
     return err_response(ErrMsg.EMAIL_TAKEN, HTTPStatus.BAD_REQUEST)
-  added_user = UserDao.add_user(UserType(**user_data))
+  added_user = UserDao.add_user(user_data)
   if not added_user:
     return err_response(ErrMsg.INVALID, HTTPStatus.BAD_REQUEST)
   token = encode_token(added_user['id'])

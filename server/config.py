@@ -10,7 +10,9 @@ default_params = {
 	'DB_PASSWORD': '',
 	'DB_NAME': 'postgres',
 	'TOKEN_EXP_MINS': 45,
-	'REDIS_URL': 'redis://:localhost:6379/0'
+	'REDIS_URL': 'redis://:localhost:6379/0',
+	'HOST': 'localhost',
+	'PORT': 5000
 }
 
 def load_env(name):
@@ -29,6 +31,7 @@ class Config():
 	CELERY_BROKER_URL = load_env('REDIS_URL')
 	CELERY_RESULT_BACKEND = load_env('REDIS_URL')
 	TOKEN_EXP_MINS = load_env('TOKEN_EXP_MINS')
+	SERVER_NAME = f'{load_env("HOST")}:{load_env("PORT")}'
 
 class DevelopmentConfig(Config):
 	ENV = 'development'

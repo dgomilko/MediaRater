@@ -12,7 +12,7 @@ def stats_mapper(reviews: list[db.Model]) -> list[dict]:
     'age': get_age(r.user.birthday),
   } for r in reviews]
 
-review_mapper = lambda reviews: [{
+review_mapper = lambda r: {
   'id': r.id,
   'text': r.text,
   'rate': r.rate,
@@ -20,7 +20,7 @@ review_mapper = lambda reviews: [{
   'author_id': r.user_id,
   'product': r.product.product.title,
   'product_id': r.product_id
-} for r in reviews]
+}
 
 product_short_mapper = lambda p: {
   'id': p.id,

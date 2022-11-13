@@ -8,6 +8,7 @@ class ErrMsg(str, Enum):
   BLACKLIST: str = 'Token blacklisted'
   NO_REVIEWS: str = 'Couldn\'t find any reviews'
   NO_USER: str = 'User not found'
+  NO_PRODUCT: str = 'Product not found'
   NO_CONTENT: str = 'Couldn\'t find this content'
   NO_STATS: str = 'Couldn\'t find any data about this product'
   NO_PAGE: str = 'Couldn\'t load this page'
@@ -16,3 +17,4 @@ class ErrMsg(str, Enum):
   WRONG_PASSWD: str = 'Invalid password'
   LOGOUT_ERROR: str = 'Error while logging out'
   NO_RECS: str = 'Not enough reviews to make recommendations'
+  REVIEWED: str = 'You have already reviewed this product'

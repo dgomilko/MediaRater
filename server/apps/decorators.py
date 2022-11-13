@@ -41,6 +41,6 @@ def authorization_needed(func: callable) -> callable:
       return err_response(ErrMsg.BLACKLIST, HTTPStatus.BAD_REQUEST)
     success, val = decode_token(token)
     if not success:
-      return err_response(val, HTTPStatus.BAD_REQUEST) 
+      return err_response(val, HTTPStatus.BAD_REQUEST)
     return func(*args, **kwargs)
   return wrapped
