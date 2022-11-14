@@ -1,0 +1,37 @@
+.fieldWrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.inputStyle {
+  margin: 0;
+  padding: 7px;
+  border-radius: 10px;
+}
+
+.inputField {
+  @extend .inputStyle;
+}
+
+.inputField:focus {
+  outline: none;
+  border:1px solid #4cbde0;
+  border-width: 2px;
+}
+
+.inputWarning {
+  @extend .inputStyle;
+  outline: none;
+  border:1px solid rgb(187, 0, 37);
+  border-width: 2px;
+}
+
+.warningWrapper {
+  margin: 0;
+  height: 12px;
+
+  span {
+    font-size: 14px;
+    color: rgb(187, 0, 37);
+  }
+}

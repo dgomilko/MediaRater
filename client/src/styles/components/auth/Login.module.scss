@@ -1,0 +1,11 @@
+@use 'utils';
+
+.areaWrapper {
+  @extend .formWrapper;
+  margin: 10% auto;
+}
+
+.loginBtn {
+  @extend .submitBtn;
+  margin-top: 2%;
+}

@@ -1,0 +1,7 @@
+@use 'utils';
+
+.areaWrapper {
+  @extend .formWrapper;
+  margin: 0 auto;
+  margin-bottom: 2%;
+}

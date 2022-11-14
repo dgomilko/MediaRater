@@ -1,5 +1,6 @@
 import functools
 from http import HTTPStatus
+import json
 from flask import request
 from dao.token.tokenDao import TokenDao
 from security_utils.tokens import decode_token
@@ -18,6 +19,7 @@ def expected_fields(expected: list[str]) -> callable:
   def actual_decorator(func: callable) -> callable:
     @functools.wraps(func)
     def wrapped(*args, **kwargs):
+      print(request.data)
       data = request.get_json()
       err = err_response(ErrMsg.INVALID, HTTPStatus.BAD_REQUEST)
       if not data: return err

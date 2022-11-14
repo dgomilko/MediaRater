@@ -1,0 +1,27 @@
+@use '../utils' as u;
+@use 'utils';
+
+.accInfoWrapper {
+  display: flex;
+  flex-direction: row;
+  margin-right: 2%;
+}
+
+.logoNameWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-left: 0;
+  margin-right: 25%;
+}
+
+.accLogo {
+  @include u.circle(50px);
+  background-color: #4cbde0;
+}
+
+.logoutText {
+  @extend .headerText;
+  padding-top: 7px;
+  cursor: pointer;
+}

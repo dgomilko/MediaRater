@@ -1,9 +1,9 @@
 import React from 'react';
 import Navbar from './Navbar';
-import AuthOptions from './AuthOptions';
+import AccountOptions from './AccountOptions';
 import { Link } from 'react-router-dom';
-import { header, title, navWrapper } from '../../styles/components/Header.module.scss';
-import { items } from '../../styles/components/NavbarLink.module.scss';
+import { items } from '../../styles/components/header/NavbarLink.module.scss';
+import { header, title, navWrapper } from '../../styles/components/header/Header.module.scss';
 
 export default function Header() {
   return (
@@ -14,7 +14,7 @@ export default function Header() {
         </Link>
         <Navbar />
       </div>
-      <AuthOptions />
+      <AccountOptions />
     </header>
   );
-}
+};

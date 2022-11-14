@@ -1,0 +1,6 @@
+@use 'utils';
+
+.items {
+  @extend .headerText;
+  margin-left: 10%;
+}

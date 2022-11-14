@@ -1,3 +1,5 @@
+@use 'utils' as u;
+
 .mediaContainer {
   display: flex;
   flex-wrap: wrap;
@@ -6,6 +8,8 @@
 }
 
 .mediaProduct {
+  cursor: pointer;
+  position: relative;
   padding-bottom: 1%;
   margin: 1%;
   flex: 0 0 270px;
@@ -24,6 +28,17 @@
   border-radius: 5%;
   width: 270px;
   height: 420px;
+}
+
+.ratingArea {
+  @include u.circle(60px);
+  position: absolute;
+  left: 3%;
+  top: 74%;
+  margin-left: 20px;
+  box-shadow:
+    inset 1px 1px 1px,
+    2px 3px 4px;
 }
 
 .mediaProduct:hover {

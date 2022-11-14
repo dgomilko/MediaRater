@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from extensions import db
 from dao.product.ProductDao import ProductDao
 
@@ -7,8 +6,8 @@ def product_dao_factory(
   specific_args: list[str],
   model: db.Model
 ):
-  def add_new(data: dataclass) -> bool:
-    speial_values = {key: getattr(data, key) for key in specific_args}
+  def add_new(data: dict) -> bool:
+    speial_values = {key: data[key] for key in specific_args}
     return ProductDao.add_product(data, model, speial_values)
 
   def get_by_id(pid: str) -> dict:

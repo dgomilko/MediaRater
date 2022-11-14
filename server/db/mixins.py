@@ -31,9 +31,8 @@ class ProductMixin(StrIdMixin, object):
 
   @declared_attr
   def reviews(cls):
-    name = cls.__name__
     return db.relationship(
-      f'{name}Review',
+      f'{cls.__name__}Review',
       back_populates='product',
       lazy='dynamic'
     )

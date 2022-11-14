@@ -1,62 +1,130 @@
-import React from 'react';
-import ReactFlagsSelect from 'react-flags-select';
-// const InputField = ({ warning, onChange, type, label }) => (
-//   <div className="sign-field">
-//     <p>{ label }:</p>
-//     <input spellCheck='false' {...{ type, onChange } } />
-//     <span className="warning">{ warning?.text }</span>
-//   </div>
-// );
-
-const InputField = ({ type, label }) => (
-  <div className="sign-field">
-    <p>{ label }:</p>
-    <input spellCheck='false' {...{ type} } />
-    {/* <span className="warning">{ warning?.text }</span> */}
-  </div>
-);
+import React, { useContext } from 'react';
+import InputField from './InputField';
+import { UserContext } from '../../contexts/UserContext';
+import { Navigate } from 'react-router-dom'
+import useFormValidation from '../../hooks/useFormValidation';
+import { signUpVerifiers } from '../../verifiers/signUpVerifiers';
+import CountrySelector from './countrySelector/CountrySelector';
+import {
+  areaWrapper,
+  title,
+  radioWrapper,
+  submitBtn,
+} from '../../styles/components/auth/Register.module.scss';
+import { warningWrapper } from '../../styles/components/auth/InputField.module.scss';
 
 export default function Register() {
-  const verifiers = {
-    username: {
-      pattern: /^[^#%\?\s/]{5,20}$/,
-      warning: 'Username should be from 5 to 20 characters, without spaces or special characters',
-    },
-    email: {
-      pattern: /^([a-z_\d\.-]+)@([a-z\d]+)\.([a-z]{2,8})(\.[a-z]{2,8})*$/,
-      warning: 'Invalid email address'
-    },
-    birthday: {
-      pattern: /^(0[1-9]|1[0-9]|2[0-9]|3[0-1])\/(0[1-9]|1[0-2])\/([0-9]{4})$/,
-      warning: 'Birth date should be entered in DD/MM/YYYY format'
-    },
-    password: {
-      pattern: /^[\S]{8,20}$/,
-      warningRegExp: 'Password should be from 8 to 20 symbols and without spaces',
+  const { userState, userDispatch } = useContext(UserContext);
+  if (userState?.id) return <Navigate to={`/user/${userState?.id}`} />;
+  const {
+    handleChange,
+    data,
+    errors,
+    setErrors
+  } = useFormValidation(signUpVerifiers);
+
+  const handleSubmit = async e => {
+    e.preventDefault();
+    const userData = {
+      ...data,
+      birthday: data.birthday.split('.').reverse().join('.') 
+    };
+    delete userData.passwordConf;
+    const requestInfo = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(userData)
+    };
+    try {
+      const url = `${process.env.REACT_APP_SERVER}/register`
+      const response = await fetch(url, requestInfo);
+      const json = await response.json();
+      if (response.status >= 400) {
+        if (response.status === 403 && json.message) {
+          setErrors({ email: json.message });
+        } else {
+          const message = json.message || 'Unknown server error';
+          throw new Error(message);
+        }
+      } else {
+        const dataToStore = { name: json.name, id: json.id, token: json.token };
+        localStorage.setItem('STORAGE_KEY', JSON.stringify(dataToStore));
+        userDispatch({type: 'SET_INFO', payload: { ...json }});
+      }
+    } catch (e) {
+      console.error(e);
     }
   };
-
+  
+  const errorsFound = !!(Object.keys(errors).length);
+  const emptyFields = Object.keys(data).length !==
+    Object.keys(signUpVerifiers.validations).length;
+  const submitImpossible = errorsFound || emptyFields;
   return (
-    <div>
-      <InputField type='text' label='Username' />
-      <InputField type='email' label='Email' />
-      <div>
-        <p>Gender:</p>
+    <div className={areaWrapper}>
+      <p className={title}>Sign up for an account</p>
+      <form onSubmit={handleSubmit} >
+        <InputField
+          type='text'
+          label='Username'
+          onChange={handleChange('name')}
+          warning={errors['name']}
+        />
+        <InputField
+          type='email'
+          label='Email'
+          onChange={handleChange('email')}
+          warning={errors['email']}
+        />
         <div>
-          <input type='radio' />Female
+          <p>Gender:</p>
+          <div className={radioWrapper}>
+          {['Female', 'Male'].map(val => {
+            const gen = val.charAt(0).toLowerCase()
+            return (
+              <div>
+                <input
+                  type='radio'
+                  value={gen}
+                  checked={data.gender === gen}
+                  onChange={handleChange('gender')}
+                />
+              {val}
+              </div>
+              )
+            })
+          }
         </div>
-        <div>
-          <input type='radio' /> Male
+        <div className={warningWrapper}>
+          <span>{errors['gender']}</span>
         </div>
-      </div>
-      <InputField type='text' label='Birthday (DD/MM/YYYY)' />
-      <div>
-        <p>Country:</p>
-        <ReactFlagsSelect fullWidth={false} />
-      </div>
-      <InputField type='password' label='Password' />
-      <InputField type='password' label='Password (confirm)' />
-      <input type='submit' value="Register" disabled={true} />
+        </div>
+        <InputField
+          type='text'
+          label='Birthday (DD.MM.YYYY)'
+          onChange={handleChange('birthday')}
+          warning={errors['birthday']}
+        />
+        <CountrySelector
+          value={data.country}
+          label='Country'
+          onChange={handleChange('country')}
+          warning={errors['country']}
+        />
+        <InputField
+          type='password'
+          label='Password'
+          onChange={handleChange('password') }
+          warning={errors['password']}
+        />
+        <InputField
+          type='password'
+          label='Password (confirm)'
+          onChange={handleChange('passwordConf')}
+          warning={errors['passwordConf']}
+        />
+        <input className={submitBtn} type='submit' value="Register" disabled={submitImpossible} />
+      </form>
     </div>
   );
-}
+};

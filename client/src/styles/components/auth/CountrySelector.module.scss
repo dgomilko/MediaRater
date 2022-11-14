@@ -1,0 +1,11 @@
+.selector {
+  width: 100%;
+  padding: 7px;
+  border-radius: 10px;
+}
+
+.selector:focus {
+  outline: none;
+  border:1px solid #4cbde0;
+  border-width: 2px;
+}

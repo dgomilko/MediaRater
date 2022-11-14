@@ -5,7 +5,7 @@ import React, {
   useRef,
   useCallback
 } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import productsReducer from '../reducers/productsReduser';
 import pageReducer from '../reducers/pageReducer';
 import {
@@ -13,8 +13,17 @@ import {
   mediaProduct,
   mediaImg,
   mediaTitle,
-  mediaRelease
+  mediaRelease,
+  ratingArea,
 } from '../styles/components/ProductList.module.scss';
+
+const calculateColor = rate => {
+  if (rate < 0) return 'hsl(0, 0%, 55%)';
+  const maxRate = 5;
+  const percenage = rate / maxRate;
+  const hue = (percenage * 120).toString(10);
+  return `hsl(${hue}, 100%, 50%)`;
+}
 
 const useFetch = (url, pageData, dispatch, field) => {
   const [items, setItems] = useState([]);
@@ -32,17 +41,23 @@ const useFetch = (url, pageData, dispatch, field) => {
       try {
         const response = await fetch(url, requestInfo);
         const data = await response.json();
-        if (response.status > 400)
-          if (response.status === 404 && data.message)
+        if (response.status >= 400) {
+          if (response.status === 404 && data.message) {
             setOutOfContent(true);
-          else message = data.message || 'Unknown server error';
-        setItems(data[field]);
-      } catch {
+          } else {
+            const message = data.message || 'Unknown server error';
+            throw new Error(message);
+          }
+        }
+        else {
+          setItems(data[field]);
+        }
+      } catch (e) {
         console.error(e);
       }
     }
     fetchList(pageData.page);
-  }, [dispatch, pageData]);
+  }, [dispatch, pageData.page]);
 
   useEffect(() => {
     setItems([]);
@@ -66,6 +81,7 @@ export default function ProductList({ type }) {
   let bottomRef = useRef(null);
   const imgRef = useRef(null);
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     pageDispatch({ type: 'CLEAR' });
@@ -101,6 +117,9 @@ export default function ProductList({ type }) {
 
   const imgObserver = useCallback(imgObserverClb, []);
 
+  const onProductClick = id =>
+    navigate(`/${type.slice(0, type.length - 1)}/${id}`)
+
   useEffect(() => {
     imgRef.current = document.querySelectorAll('.' + mediaImg);
     if (imgRef.current)
@@ -121,10 +140,13 @@ export default function ProductList({ type }) {
     <div>
       <div className={mediaContainer}>
         {productsList.data.map((p, i) => {
-          const { title, img_path, release } = p;
+          const { id, title, img_path, release, rating } = p;
           return (
-            <div key={i} className={mediaProduct}>
+            <div key={i} className={mediaProduct} onClick={() => onProductClick(id)}>
               <img className={mediaImg} data-src={img_path}/>
+              <div class={ratingArea} style={{backgroundColor: calculateColor(rating)}} >
+                <span>{rating >= 0 ? rating : 'TBD'}</span>
+              </div>
               <p class={mediaTitle}>{title}</p>
               <p class={mediaRelease}>{release.slice(0, 4)}</p>
             </div>

@@ -15,7 +15,7 @@ def register() -> tuple[dict, int]:
   user_data = request.get_json()
   email_taken = UserDao.get_by_email(user_data['email']) is not None
   if email_taken:
-    return err_response(ErrMsg.EMAIL_TAKEN, HTTPStatus.BAD_REQUEST)
+    return err_response(ErrMsg.EMAIL_TAKEN, HTTPStatus.FORBIDDEN)
   added_user = UserDao.add_user(user_data)
   if not added_user:
     return err_response(ErrMsg.INVALID, HTTPStatus.BAD_REQUEST)
@@ -33,7 +33,7 @@ def login() -> tuple[dict, int]:
   passwds = [p['password'] for p in [user_data, found_user]]
   password_correct = check_passwd(*passwds)
   if not password_correct:
-    return err_response(ErrMsg.WRONG_PASSWD, HTTPStatus.BAD_REQUEST)
+    return err_response(ErrMsg.WRONG_PASSWD, HTTPStatus.FORBIDDEN)
   del found_user['password']
   token = encode_token(found_user['id'])
   return {**found_user, 'token': token}, HTTPStatus.OK

@@ -1,5 +1,6 @@
 from sqlalchemy.exc import IntegrityError
 from dao.dao import Dao
+import numpy as np
 from extensions import db
 from db.models import *
 from dao.model_mappers import *
@@ -40,7 +41,10 @@ class ProductDao(Dao):
   def get_product_by_id(pid: str, model: db.Model) -> tuple[any, dict]:
     result = super(ProductDao, ProductDao).get_by_id(model, pid)
     if not result: return (None, None)
+    rating = ProductDao.__get_rating(result)
     common = product_mapper(result)
+    common['rating'] = rating
+    common['reviews'] = len(result.reviews.all())
     return (result, common)
   
   @staticmethod
@@ -64,7 +68,10 @@ class ProductDao(Dao):
     limit = results_per_page * page
     result = model.query.slice(offset, limit).all()
     if not result: return None
-    return [product_short_mapper(r) for r in result]
+    return [{
+      **product_short_mapper(r),
+      'rating': ProductDao.__get_rating(r)
+    } for r in result]
 
   @staticmethod
   def get_stats(pid: str, model: db.Model) -> list[dict]:
@@ -84,3 +91,8 @@ class ProductDao(Dao):
         genre = Genre.query.filter_by(name=genre_name).first()
       result.append({'name': genre.name, 'id': genre.id})
     return result
+
+  def __get_rating(product: any) -> float:
+    average = np.average([rev.rate for rev in product.reviews])
+    filtered = np.nan_to_num(average, nan=-1.0)
+    return round(filtered, 1)

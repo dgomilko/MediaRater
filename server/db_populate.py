@@ -95,11 +95,11 @@ def populate_reviews(
   product_model: any
 ):
   for user in users:
-    db_user = User.query.filter_by(name=user.name).first()
+    db_user = User.query.filter_by(name=user['name']).first()
     reiewed_products = sample(products, randint(0, 50))
     for product in reiewed_products:
       db_product = product_model.query.join(MediaProduct) \
-        .filter_by(title=product.title).first()
+        .filter_by(title=product['title']).first()
       review_data = {
         'user_id': db_user.id,
         'product_id': db_product.id,
@@ -110,7 +110,7 @@ def populate_reviews(
 def populate_db():
   for user in users: UserDao.add_user(user)
   for path, (
-    product_model, product_type, product_dao, review_dao
+    product_model, product_dao, review_dao
   ) in db_details.items():
-    products = populate_product(path, product_type, product_dao)
+    products = populate_product(path, product_dao)
     populate_reviews(products, review_dao, product_model)

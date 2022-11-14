@@ -69,7 +69,7 @@ def add_review(review_dao: ReviewDao, product_dao: ProductDao):
 routes_fns = {
   '/product/movie-desc': lambda: description(MovieReviewDao, MovieDao),
   '/product/book-desc': lambda: description(BookReviewDao, BookDao),
-  '/product/show-desc': lambda: description(BookReviewDao, BookDao),
+  '/product/show-desc': lambda: description(ShowReviewDao, ShowDao),
 
   '/product/movie-reviews': lambda: reviews(MovieDao),
   '/product/book-reviews': lambda: reviews(BookDao),

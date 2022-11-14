@@ -56,7 +56,7 @@ def create_matrix(
 
 def ids_to_info(ids: list[str], dao: ProductDao) -> list[dict]:
   full_info = [dao.get_by_id(id) for id in ids]
-  keys_to_preserve = ['id', 'title', 'release', 'img_path']
+  keys_to_preserve = ['id', 'title', 'release', 'img_path', 'rating']
   remove_except = lambda d: {
     k: v for k, v in d.items() if k in keys_to_preserve
   }
