@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_cors import CORS
 from extensions import db
 from apps.authenticate.views import authenticate
 from apps.user.views import user
@@ -16,6 +17,7 @@ def create_app() -> Flask:
   apps = [authenticate, user, product, recommend, products_list]
   app = Flask(__name__)
   app.config.from_object('config.DevelopmentConfig')
+  CORS(app)
   init_db(app)
   # populate_db()
   for bp in apps: app.register_blueprint(bp)

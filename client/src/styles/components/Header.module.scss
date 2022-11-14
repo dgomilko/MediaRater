@@ -1,16 +1,28 @@
 .header {
   display: flex;
-  justify-content: center;
   align-items: center;
   top: 0;
   left: 0;
   height: 100px;
   width: 100%;
   background-color: rgb(108, 68, 152);
+  padding: 0 5% 0 1%;
+  box-sizing: border-box;
+  justify-content: space-between;
+}
+
+.navWrapper {
+  display: flex;
+  justify-content: flex-start;
+  flex-wrap: nowrap;
+  align-self: center;
+  align-items: center;
 }
 
 .title {
   font-size: 42px;
+  padding-bottom: 10px;
+  text-decoration: none;
   background: -webkit-linear-gradient(0deg, #4cbde0, #4deccd);
   background-clip:  content-box;
   -webkit-background-clip: text;

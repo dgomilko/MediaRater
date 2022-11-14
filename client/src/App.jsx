@@ -1,25 +1,27 @@
 import React from 'react';
-import './styles/styles.scss';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { pagewrap } from './styles/components/App.module.scss'
 import Footer from './components/Footer';
-import Header from './components/Header';
+import ProductList from './components/ProductList';
+import Header from './components/header/Header';
 import Home from './components/Home';
-import {Movies, Shows, Books} from './components/ProductList'
-import Content from './components/Content';
-import { NavLink, BrowserRouter, Route, Routes } from 'react-router-dom';
-
+import Register from './components/auth/Register';
+import Login from './components/auth/Login';
+import './styles/styles.scss';
 
 export default function App() {
   return (
     <div>
       <div className={pagewrap}>
-        <Header />
         <BrowserRouter>
+          <Header />
           <Routes>
-            <Route exact path="/" element={<Home />} />
-            <Route path="/movies" element={<Movies />} />
-            <Route path="/shows" element={<Shows />} />
-            <Route path="/books" element={<Books />} />
+            <Route exact path="/" element={ <Home /> } />
+            <Route path="/movies" element={ <ProductList type='movies'/> } />
+            <Route path="/shows" element={ <ProductList type='shows'/> } />
+            <Route path="/books" element={ <ProductList type='books'/> } />
+            <Route path="/login" element={ <Login /> } />
+            <Route path="/register" element={ <Register /> } />
           </Routes>
         </BrowserRouter>
       </div>

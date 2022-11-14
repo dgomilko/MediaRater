@@ -10,7 +10,7 @@ module.exports = {
     path: path.resolve(__dirname, 'dist'),
   },
   resolve: {
-    extensions: ['.js', '.jsx']
+    extensions: ['.js', '.ts', '.jsx']
   },
   devServer: {
     hot: true,
@@ -32,7 +32,7 @@ module.exports = {
         },
       },
       {
-        test: /\.scss$/,
+        test: /\.s?css$/,
           use: [
             { loader: 'style-loader'},
             {
@@ -52,6 +52,7 @@ module.exports = {
     new HtmlWebPackPlugin({
       template: path.resolve(__dirname, '/src/index.html'),
     }),
+    new Dotenv()
   ],
   performance: {
     hints: false,

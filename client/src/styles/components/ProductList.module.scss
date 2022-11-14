@@ -1,0 +1,39 @@
+.mediaContainer {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 3% 5%;
+  justify-content: center;
+}
+
+.mediaProduct {
+  padding-bottom: 1%;
+  margin: 1%;
+  flex: 0 0 270px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  border-radius: 5%;
+  box-shadow: 2px 4px 8px;
+
+  p {
+    margin: 1% 1% 0 1%;
+  }
+}
+
+.mediaImg {
+  border-radius: 5%;
+  width: 270px;
+  height: 420px;
+}
+
+.mediaProduct:hover {
+  transform: scale(1.05);
+}
+
+.mediaTitle {
+  font-weight: 700;
+}
+
+.mediaRelease {
+  color: gray;
+}
