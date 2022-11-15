@@ -1,5 +1,6 @@
 import React, { useContext } from 'react';
 import { UserContext } from '../../contexts/UserContext';
+import { useNavigate } from 'react-router-dom';
 import {
   accInfoWrapper,
   accLogo,
@@ -10,6 +11,7 @@ import {
 
 export default function AccInfo() {
   const { userState, userDispatch } = useContext(UserContext);
+  const navigate = useNavigate();
 
   const handleLogout = async () => {
     if (!userState.token) return;
@@ -41,9 +43,11 @@ export default function AccInfo() {
     }
   };
 
+  const onLogoClick = id => navigate(`/user/${userState.id}`);
+
   return (
     <div className={accInfoWrapper}>
-      <div className={logoNameWrapper}>
+      <div className={logoNameWrapper} onClick={onLogoClick}>
         <div className={accLogo}>
           <span>{userState?.name.slice(0, 1)}</span>
         </div>

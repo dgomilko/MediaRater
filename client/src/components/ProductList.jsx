@@ -6,6 +6,7 @@ import React, {
   useCallback
 } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import Rating from './product/Rating';
 import productsReducer from '../reducers/productsReduser';
 import pageReducer from '../reducers/pageReducer';
 import {
@@ -16,14 +17,6 @@ import {
   mediaRelease,
   ratingArea,
 } from '../styles/components/ProductList.module.scss';
-
-const calculateColor = rate => {
-  if (rate < 0) return 'hsl(0, 0%, 55%)';
-  const maxRate = 5;
-  const percenage = rate / maxRate;
-  const hue = (percenage * 120).toString(10);
-  return `hsl(${hue}, 100%, 50%)`;
-}
 
 const useFetch = (url, pageData, dispatch, field) => {
   const [items, setItems] = useState([]);
@@ -118,7 +111,7 @@ export default function ProductList({ type }) {
   const imgObserver = useCallback(imgObserverClb, []);
 
   const onProductClick = id =>
-    navigate(`/${type.slice(0, type.length - 1)}/${id}`)
+    navigate(`/${type.slice(0, type.length - 1)}/${id}`);
 
   useEffect(() => {
     imgRef.current = document.querySelectorAll('.' + mediaImg);
@@ -144,9 +137,7 @@ export default function ProductList({ type }) {
           return (
             <div key={i} className={mediaProduct} onClick={() => onProductClick(id)}>
               <img className={mediaImg} data-src={img_path}/>
-              <div class={ratingArea} style={{backgroundColor: calculateColor(rating)}} >
-                <span>{rating >= 0 ? rating : 'TBD'}</span>
-              </div>
+              <Rating className={ratingArea} rating={rating} />
               <p class={mediaTitle}>{title}</p>
               <p class={mediaRelease}>{release.slice(0, 4)}</p>
             </div>

@@ -42,5 +42,6 @@ user_mapper = lambda u: {
   'birthday': u.birthday,
   'country': u.country,
   'gender': u.gender,
-  'password': u.password
+  'password': u.password,
+  'reviews': len(u.book_reviews.all() + u.show_reviews.all() + u.movie_reviews.all()),
 }
