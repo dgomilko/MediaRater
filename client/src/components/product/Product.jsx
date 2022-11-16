@@ -1,5 +1,9 @@
 import React from 'react';
+import { Routes, Route } from 'react-router-dom';
 import useDescriptionFetch from '../../hooks/useDescriptionFetch';
+import ProductReviews from './ProductReviews'; 
+import ProductNavbar from './ProductNavbar';
+import ProductStats from './ProductStats';
 import Rating from './Rating';
 import {
   descriptionWrapper,
@@ -28,7 +32,7 @@ export default function Product({ type }) {
 
   return (
     <div>
-      {error ? error : (
+      {error || (
         <div className={descriptionWrapper}>
           <div>
             <img src={data?.img_path}/>
@@ -56,6 +60,11 @@ export default function Product({ type }) {
           </div>
         </div>
       )}
+      <ProductNavbar />
+      <Routes>
+        <Route path='' element={<ProductReviews />}/>
+        <Route path='stats' element={<ProductStats />}/>
+      </Routes>
     </div>
   );
 };

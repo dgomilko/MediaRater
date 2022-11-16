@@ -23,12 +23,12 @@ export default function App() {
               <Route exact path='/' element={ <Home /> } />
               <Route path='/login' element={ <Login /> } />
               <Route path='/register' element={ <Register /> } />
-              <Route path='/user/:id' element={ <Profile /> } />
+              <Route path='/user/:id/*' element={ <Profile /> } />
               {['movies', 'shows', 'books'].map(type => (
                 <Route path={`/${type}`} element={ <ProductList type={type} /> } />
               ))}
               {['movie', 'show', 'book'].map(type => (
-                <Route path={`/${type}/:id`} element={ <Product type={type} /> } />
+                <Route path={`/${type}/:id/*`} element={ <Product type={type} /> } />
               ))}
             </Routes>
           </BrowserRouter>

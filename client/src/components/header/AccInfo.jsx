@@ -1,6 +1,7 @@
 import React, { useContext } from 'react';
-import { UserContext } from '../../contexts/UserContext';
 import { useNavigate } from 'react-router-dom';
+import { UserContext } from '../../contexts/UserContext';
+import AccLogo from '../profile/AccLogo';
 import {
   accInfoWrapper,
   accLogo,
@@ -48,9 +49,7 @@ export default function AccInfo() {
   return (
     <div className={accInfoWrapper}>
       <div className={logoNameWrapper} onClick={onLogoClick}>
-        <div className={accLogo}>
-          <span>{userState?.name.slice(0, 1)}</span>
-        </div>
+        <AccLogo name={userState?.name} className={accLogo} />
         <span className={headerText}>{userState?.name}</span>
       </div>
       <p className={logoutText} onClick={handleLogout}>

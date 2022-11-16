@@ -1,5 +1,10 @@
 import React from 'react';
 import useDescriptionFetch from '../../hooks/useDescriptionFetch';
+import { Routes, Route } from 'react-router-dom';
+import Recommendations from './Recommendations';
+import UserReviews from './UserReviews';
+import AccLogo from './AccLogo';
+import ProfileNavbar from './ProfileNavbar';
 import {
   accountWrapper,
   logo,
@@ -14,14 +19,13 @@ export default function Profile() {
     'my_id',
     'user/profile'
   );
+  const types = ['movie', 'book', 'show'];
   
   return (
     <div>
-      {error ? error : (
+      {error || (
         <div className={accountWrapper}>
-          <div className={logo}>
-            <span>{data?.name?.slice(0, 1)}</span>
-          </div>
+          <AccLogo name={data?.name} className={logo} />
           <div className={textInfoWrapper}>
             <div className={username}>
               <p>{data?.name}</p>
@@ -40,6 +44,15 @@ export default function Profile() {
           </div>
         </div>
       )}
+    <ProfileNavbar />
+    <Routes>
+      {types.map(type => (
+        <Route path={`${type}-reviews`} element={<UserReviews type={type} />}/>
+      ))}
+      {types.map(type => (
+        <Route path={`${type}-recommendations`} element={<Recommendations type={type} />}/>
+      ))} 
+    </Routes>
     </div>
   );
 };
