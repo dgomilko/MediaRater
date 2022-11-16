@@ -1,3 +1,5 @@
+@use '../variables' as v;
+
 @mixin circle($size) {
   display: flex;
   justify-content: center;
@@ -17,13 +19,41 @@
   }
 }
 
+@mixin flex($direction, $justify: false, $align: false) {
+  display: flex;
+  flex-direction: $direction;
+  @if $justify {
+    justify-content: $justify;
+  }
+  @if $align {
+    align-items: $align;
+  }
+}
+
 .descriptionBackground {
   display: flex;
   flex-direction: row;
   top: 0;
   left: 0;
   width: 99vw;
-  background: linear-gradient(#4deccd, #4cbde0);
+  background: linear-gradient(v.$theme_green, v.$theme_blue);
   box-sizing: border-box;
   align-items: center;
+}
+
+.submitBtn {
+  cursor: pointer;
+  align-self: center;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 18px;
+  padding: 0.5% 2% 1% 2%;
+  background-color: v.$theme_blue;
+  border-color: v.$btn_border;
+  color: white;
+}
+
+.submitBtn:disabled {
+  cursor: auto;
+  background-color: gray;
 }

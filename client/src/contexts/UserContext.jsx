@@ -8,8 +8,7 @@ export function UserProvider(props) {
   
   useEffect(() => {
     const localData = localStorage.getItem(process.env.REACT_APP_STORAGE_KEY);
-    if (!localData) return;
-    const data = JSON.parse(localData);
+    const data = localData ? JSON.parse(localData) : { id : null };
     userDispatch({type: 'SET_INFO', payload: { ...data }});
   }, []);
 

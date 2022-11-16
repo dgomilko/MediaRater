@@ -1,0 +1,87 @@
+@use '../utils' as u;
+@use '../../variables' as v;
+
+.modalWrapper {
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  overflow: auto;
+}
+
+.modal {
+  background-color: white;
+  padding: 0;
+  margin: 5% auto;
+  width: 70%;
+  max-width: 640px;
+  height: 70%;
+  border: 1px solid black;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.header {
+  background: linear-gradient(45deg, v.$theme_blue, v.$theme_green);
+  margin: 0;
+  margin-bottom: 2%;
+  height: 40px;
+  line-height: 40px;
+  padding: 5px 20px;
+  text-align: right;
+}
+
+.close {
+  text-decoration: none;
+  float: right;
+  font-size: 25px;
+  font-weight: 600;
+}
+
+.close:hover, 
+.close:focus {
+    cursor: pointer;
+}
+
+.textbox {
+  resize: none;
+  width: 500px;
+  height: 300px;
+  overflow: scroll;
+  border-radius: 10px;
+  box-shadow: 0 0 0 1px #000;
+  border: 4px solid transparent;
+}
+
+.textbox:focus {
+  outline:none;
+  box-shadow: 0 0 0 1px v.$theme_blue;
+}
+
+.rateWrapper {
+  @include u.flex(row, $align: center, $justify: center);
+
+  span {
+    margin-right: 2%;
+  }
+}
+
+.blockWrapper {
+  @include u.flex(column, $align: center, $justify: center);
+}
+
+.textWrapper {
+  @include u.flex(column, $align: baseline, $justify: center);
+
+  span {
+    margin-bottom: 2%;
+  }
+}
+
+.addReview {
+  @extend .submitBtn;
+  margin-top: 3%;
+}

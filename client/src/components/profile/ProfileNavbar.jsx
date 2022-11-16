@@ -5,16 +5,14 @@ import {
   navbarWrapper,
 } from '../../styles/components/profile/ProfileNavbar.module.scss'
 
-export default function ProfileNavbar() {
+export default function ProfileNavbar({ ownPage }) {
   const products = ['Movies', 'Shows', 'Books'];
   const location = useLocation();
   const path = location.pathname.split('/')[3];
   const selected = path?.split('-')[1];
-  
-  const menus = [
-    ['Reviews', products],
-    ['Recommendations', products],
-  ];
+  const menus = [['Reviews', products]];
+
+  if (ownPage) menus.push(['Recommendations', products]);
 
   return (
     <ul className={navbarWrapper}>

@@ -1,4 +1,5 @@
 @use '../utils.scss' as u;
+@use '../../variables' as v;
 
 .descriptionWrapper {
   @extend .descriptionBackground;
@@ -17,9 +18,7 @@
 }
 
 .titleRow {
-  display: flex;
-  flex-direction: row;
-  align-items: baseline;
+  @include u.flex(row, $align: baseline);
 
   p {
     font-size: 50px;
@@ -37,10 +36,9 @@
 }
 
 .genreLengthWrapper {
-  display: flex;
-  flex-direction: row;
-  border-top: 2px solid rgba(95, 95, 95, 0.5);
-  border-bottom: 2px solid rgba(95, 95, 95, 0.5);
+  @include u.flex(row);
+  border-top: v.$delim;
+  border-bottom: v.$delim;
   
   p {
     margin-left: 1%;
@@ -48,17 +46,17 @@
 }
 
 .scoreWrapper {
-  display: flex;
-  flex-direction: row;
+  @include u.flex(row, $align: center);
+  max-width: 1100px;
   margin-top: 1%;
   padding-bottom: 1%;
-  align-items: center;
-  border-bottom: 2px solid rgba(95, 95, 95, 0.5);
+  border-bottom: v.$delim;
 
   p {
-    width: 5%;
+    width: 60px;
     font-weight: 600;
     text-align: center;
+    margin-left: 10px;
   }
 }
 
@@ -82,4 +80,14 @@
     font-size: 18px;
     font-weight: 200;
   }
+}
+
+.addReviewWrapper {
+  width: 250px;
+  margin-left: 3%;
+}
+
+.addReview {
+  @extend .submitBtn;
+  padding: 2%;
 }

@@ -1,4 +1,5 @@
 @use '../utils.scss' as u;
+@use '../../variables' as v;
 
 .accountWrapper {
   @extend .descriptionBackground;
@@ -7,7 +8,7 @@
 
 .logo {
   @include u.circle(110px);
-  background-color: #4cbde0;
+  background-color: v.$theme_blue;
 
   span {
     font-size: 50px;
@@ -15,16 +16,13 @@
 }
 
 .textInfoWrapper {
-  display: flex;
-  flex-direction: column;
+  @include u.flex(column);
   margin-left: 3%;
   width: 50%;
 }
 
 .username {
-  display: flex;
-  flex-direction: row;
-  align-items: baseline;
+  @include u.flex(row, $align: baseline);
   margin-bottom: 0;
   
   p {
@@ -42,12 +40,10 @@
 }
 
 .detailsWrapper {
-  display: flex;
-  flex-direction: row;
+  @include u.flex(row);
 
   div {
-    display: flex;
-    flex-direction: column;
+    @include u.flex(column);
     padding: 0 3%;
   }
 
@@ -65,5 +61,5 @@
 }
 
 .bordered {
-  border-right: 2px solid rgba(95, 95, 95, 0.5);
+  border-right: v.$delim;
 }

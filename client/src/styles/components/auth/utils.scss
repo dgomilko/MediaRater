@@ -2,6 +2,9 @@
   display: flex;
   flex-direction: column;
   width: 35%;
+  box-shadow: 2px 4px 6px;
+  padding: 1% 2%;
+  border-radius: 30px;
 
   p {
     margin-bottom: 0;
@@ -24,19 +27,4 @@
   display: flex;
   flex-direction: row;
   font-size: 17px;
-}
-
-.submitBtn {
-  align-self: center;
-  border-radius: 15px;
-  font-weight: 600;
-  font-size: 18px;
-  padding: 5px;
-  background-color: #4cbde0;
-  border-color: #0d385e;
-  color: white;
-}
-
-.submitBtn:disabled {
-  background-color: gray;
 }

@@ -1,21 +1,18 @@
 @use 'utils' as u;
 
 .mediaContainer {
-  display: flex;
+  @include u.flex(row, $justify: center);
   flex-wrap: wrap;
   margin: 3% 5%;
-  justify-content: center;
 }
 
 .mediaProduct {
+  @include u.flex(column, $align: center);
+  flex: 0 0 270px;
   cursor: pointer;
   position: relative;
   padding-bottom: 1%;
   margin: 1%;
-  flex: 0 0 270px;
-  display: flex;
-  align-items: center;
-  flex-direction: column;
   border-radius: 5%;
   box-shadow: 2px 4px 8px;
 

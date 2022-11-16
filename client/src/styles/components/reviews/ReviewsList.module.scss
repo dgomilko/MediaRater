@@ -1,29 +1,17 @@
+@use '../utils' as u;
+
 .reviewsWrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
+  @include u.flex(column, $align: stretch);
   margin: 0 auto;
   width: 60%;
   box-sizing: border-box;
 }
 
 .btnWrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  @include u.flex(row, $align: center, $justify: center);
 }
 
 .loadMore {
+  @extend .submitBtn;
   margin: 1% auto;
-  padding: 0.5% 2% 1% 2%;
-  border-radius: 20px;
-  font-weight: 600;
-  font-size: 18px;
-  background-color: #4cbde0;
-  border-color: #0d385e;
-  color: white;
-}
-
-.loadMore:disabled {
-  background-color: gray;
 }

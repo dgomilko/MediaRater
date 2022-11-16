@@ -1,6 +1,8 @@
+@use '../utils.scss' as u;
+@use '../../variables' as v;
+
 .fieldWrapper {
-  display: flex;
-  flex-direction: column;
+  @include u.flex(column);
 }
 
 .inputStyle {
@@ -15,14 +17,14 @@
 
 .inputField:focus {
   outline: none;
-  border:1px solid #4cbde0;
+  border: 1px solid v.$theme_blue;
   border-width: 2px;
 }
 
 .inputWarning {
   @extend .inputStyle;
   outline: none;
-  border:1px solid rgb(187, 0, 37);
+  border: 1px solid v.$warning;
   border-width: 2px;
 }
 
@@ -32,6 +34,6 @@
 
   span {
     font-size: 14px;
-    color: rgb(187, 0, 37);
+    color: v.$warning;
   }
 }

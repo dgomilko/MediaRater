@@ -1,15 +1,14 @@
 @use '../utils' as u;
+@use '../../variables' as v;
 
 .authorWrapper {
-  display: flex;
-  flex-direction: row;
+  @include u.flex(row, $align: center);
   margin-left: 20px;
-  align-items: center;
 }
 
 .accLogo {
   @include u.circle(35px);
-  background-color: #4cbde0;
+  background-color: v.$theme_blue;
   margin-left: 25%;
   box-shadow:
     inset 1px 1px 1px,
@@ -17,10 +16,8 @@
 }
 
 .logoWrapper {
+  @include u.flex(column, $align: center);
   cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
 }
 
 .username {

@@ -1,8 +1,9 @@
+@use 'utils' as u;
+@use '../variables' as v;
+
 .footer {
-  display: flex;
-  justify-content: center;
+  @include u.flex(row, $justify: center, $align: center);
   height: 5vh;
-  align-items: center;
   width: 100%;
-  background-color: rgb(108, 68, 152);
+  background-color: v.$theme_purple;
 }

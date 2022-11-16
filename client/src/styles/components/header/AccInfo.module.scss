@@ -1,24 +1,22 @@
 @use '../utils' as u;
+@use '../../variables' as v;
 @use 'utils';
 
 .accInfoWrapper {
-  display: flex;
-  flex-direction: row;
+  @include u.flex(row);
   margin-right: 2%;
 }
 
 .logoNameWrapper {
+  @include u.flex(column, $align: center);
   cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   margin-left: 0;
   margin-right: 25%;
 }
 
 .accLogo {
   @include u.circle(50px);
-  background-color: #4cbde0;
+  background-color: v.$theme_blue;
 }
 
 .logoutText {

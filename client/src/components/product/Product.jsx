@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useContext, useState } from 'react';
 import { Routes, Route } from 'react-router-dom';
+import { UserContext } from '../../contexts/UserContext';
 import useDescriptionFetch from '../../hooks/useDescriptionFetch';
 import ProductReviews from './ProductReviews'; 
 import ProductNavbar from './ProductNavbar';
 import ProductStats from './ProductStats';
+import AddReviewModal from '../reviews/AddReviewModal';
 import Rating from './Rating';
 import {
   descriptionWrapper,
@@ -13,9 +15,13 @@ import {
   ratingScore,
   scoreWrapper,
   synopsis,
+  addReview,
+  addReviewWrapper,
 } from '../../styles/components/product/Product.module.scss';
 
 export default function Product({ type }) {
+  const { userState } = useContext(UserContext);
+  const [modal, setModal] = useState(false);
   const { data, error } = useDescriptionFetch(
     'user_id',
     `product/${type}-desc`
@@ -29,6 +35,7 @@ export default function Product({ type }) {
     'movie': [data?.director],
     'book': [data?.author],
   };
+  const toggleModal = () => setModal(!modal);
 
   return (
     <div>
@@ -52,6 +59,20 @@ export default function Product({ type }) {
             <div className={scoreWrapper}>
               <p>Average score:</p>
               <Rating className={ratingScore} rating={data?.rating} />
+              {data?.reviewed ? <p>Your score:</p> : ''}
+              {data?.reviewed ?
+                <Rating className={ratingScore} rating={data.reviewed} /> :
+                userState?.token ?
+                  <div className={addReviewWrapper}>
+                    <AddReviewModal type={type} productId={data.id} display={modal} closeFn={toggleModal}/>
+                    <input
+                      type='button'
+                      className={addReview}
+                      value='Add review'
+                      onClick={toggleModal} 
+                    />
+                  </div>  : ''
+              }
             </div>
             <div className={synopsis}>
               <p>Synopsis:</p>

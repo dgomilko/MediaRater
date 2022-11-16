@@ -14,7 +14,7 @@ export default function CollapsibleReview({ header, product }) {
   const ref = useRef();
   const [expandBtn, setExpandBtn] = useState(false);
   const [expanded, setExpanded] = useState(false);
-  const clampedHeight = 120;
+  const clampedHeight = 150;
 
   useEffect(() => {
     if (ref.current.scrollHeight > clampedHeight) {

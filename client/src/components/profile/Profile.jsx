@@ -44,7 +44,7 @@ export default function Profile() {
           </div>
         </div>
       )}
-    <ProfileNavbar />
+    <ProfileNavbar ownPage={data?.my_page} />
     <Routes>
       {types.map(type => (
         <Route path={`${type}-reviews`} element={<UserReviews type={type} />}/>

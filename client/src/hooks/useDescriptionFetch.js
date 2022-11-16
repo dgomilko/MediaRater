@@ -11,11 +11,11 @@ export default function useDescriptionFetch(userParam, route) {
 
   useEffect(() => {
     const fetchData = async () => {
-      if (!id) return;
+      if (!id || user_id === undefined) return;
       const requestInfo = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ [userParam]: user_id || null, id }),
+        body: JSON.stringify({ [userParam]: user_id, id }),
       };
       try {
         const url = `${process.env.REACT_APP_SERVER}/${route}`;
@@ -33,7 +33,7 @@ export default function useDescriptionFetch(userParam, route) {
     };
   
     fetchData();
-  }, [user_id]);
+  }, [userState]);
 
   return { data, error };
 };

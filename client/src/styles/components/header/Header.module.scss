@@ -1,6 +1,8 @@
+@use '../utils' as u;
+@use '../../variables' as v;
+
 .header {
-  display: flex;
-  align-items: center;
+  @include u.flex(row, $align: center, $justify: space-between);
   top: 0;
   left: 0;
   height: 100px;
@@ -8,22 +10,19 @@
   background-color: rgb(108, 68, 152);
   padding: 0 5% 0 1%;
   box-sizing: border-box;
-  justify-content: space-between;
 }
 
 .navWrapper {
-  display: flex;
-  justify-content: flex-start;
+  @include u.flex(row, $justify: flex-start, $align: center);
   flex-wrap: nowrap;
   align-self: center;
-  align-items: center;
 }
 
 .title {
   font-size: 42px;
   padding-bottom: 10px;
   text-decoration: none;
-  background: -webkit-linear-gradient(0deg, #4cbde0, #4deccd);
+  background: linear-gradient(0deg, v.$theme_blue, v.$theme_green);
   background-clip:  content-box;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;

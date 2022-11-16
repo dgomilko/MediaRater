@@ -1,4 +1,5 @@
-@use 'utils';
+@use 'utils' as u1;
+@use '../utils' as u2;
 
 .areaWrapper {
   @extend .formWrapper;
@@ -7,5 +8,6 @@
 
 .loginBtn {
   @extend .submitBtn;
+  align-self: center;
   margin-top: 2%;
 }

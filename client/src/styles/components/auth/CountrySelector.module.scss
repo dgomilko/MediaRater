@@ -1,3 +1,5 @@
+@use '../../variables' as v;
+
 .selector {
   width: 100%;
   padding: 7px;
@@ -6,6 +8,6 @@
 
 .selector:focus {
   outline: none;
-  border:1px solid #4cbde0;
+  border:1px solid v.$theme_blue;
   border-width: 2px;
 }

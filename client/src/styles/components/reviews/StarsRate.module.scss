@@ -1,0 +1,17 @@
+@use '../../variables' as v;
+
+.baseStyle {
+  color: transparent;
+  font-size: 35px;
+  cursor: pointer;
+}
+
+.starOn {
+  @extend .baseStyle;
+  text-shadow: 0 0 0 v.$theme_green;
+}
+
+.starOff {
+  @extend .baseStyle;
+  text-shadow: 0 0 0 grey;
+}

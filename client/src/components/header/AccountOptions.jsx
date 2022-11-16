@@ -5,7 +5,7 @@ import AccInfo from './AccInfo';
 
 export default function AccountOptions() {
   const { userState } = useContext(UserContext);
-  return Object.keys(userState).length ?
+  return (userState.id) ?
     <AccInfo /> :
     <AuthOptions />;
 };
