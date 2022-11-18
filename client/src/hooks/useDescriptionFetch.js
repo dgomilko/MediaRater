@@ -17,8 +17,8 @@ export default function useDescriptionFetch(userParam, route) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ [userParam]: user_id, id }),
       };
+      const url = `${process.env.REACT_APP_SERVER}/${route}`;
       try {
-        const url = `${process.env.REACT_APP_SERVER}/${route}`;
         const response = await fetch(url, requestInfo);
         const json = await response.json();
         if (response.status >= 400) {

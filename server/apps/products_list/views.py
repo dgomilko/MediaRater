@@ -10,8 +10,17 @@ products_list = Blueprint('products_list', __name__)
 
 @expected_fields(['page'])
 def load(dao: ProductDao):
-  page = request.get_json()['page']
-  res = dao.load(page)
+  data = request.get_json()
+  page = data['page']
+  options = {
+    'order': ['asc', 'desc'],
+    'filter': ['title', 'rating', 'popular']
+  }
+  kwargs = {
+    k: data[k] for k, v in options.items()
+      if k in data.keys() and data[k] in v
+  }
+  res = dao.load(page, **kwargs)
   valid = {'products': res}, HTTPStatus.OK
   return valid if res else err_response(
     ErrMsg.NO_PAGE,

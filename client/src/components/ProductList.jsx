@@ -5,18 +5,10 @@ import React, {
   useRef,
   useCallback
 } from 'react';
+import LazyLoadList from './LazyLoadList';
 import { useLocation, useNavigate } from 'react-router-dom';
-import Rating from './product/Rating';
 import productsReducer from '../reducers/productsReduser';
 import pageReducer from '../reducers/pageReducer';
-import {
-  mediaContainer,
-  mediaProduct,
-  mediaImg,
-  mediaTitle,
-  mediaRelease,
-  ratingArea,
-} from '../styles/components/ProductList.module.scss';
 
 const useFetch = (url, pageData, dispatch, field) => {
   const [items, setItems] = useState([]);
@@ -72,7 +64,6 @@ export default function ProductList({ type }) {
     { data: [], fetching: true }
   );
   let bottomRef = useRef(null);
-  const imgRef = useRef(null);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -94,30 +85,8 @@ export default function ProductList({ type }) {
     [pageDispatch]
   );
 
-  const imgObserverClb = node => {
-    const observer = new IntersectionObserver(elements => {
-      elements.forEach(e => {
-        if (e.intersectionRatio > 0) {
-          const currentImg = e.target;
-          const newImgSrc = currentImg.dataset.src;
-          if (newImgSrc) currentImg.src = newImgSrc;
-          observer.unobserve(node);
-        }
-      });
-    })
-    observer.observe(node);
-  }
-
-  const imgObserver = useCallback(imgObserverClb, []);
-
   const onProductClick = id =>
     navigate(`/${type.slice(0, type.length - 1)}/${id}`);
-
-  useEffect(() => {
-    imgRef.current = document.querySelectorAll('.' + mediaImg);
-    if (imgRef.current)
-      imgRef.current.forEach(img => imgObserver(img));
-  }, [imgObserver, imgRef, productsList.data]);
 
   useEffect(() => {
     if (bottomRef.current) bottomObserver(bottomRef.current);
@@ -131,25 +100,12 @@ export default function ProductList({ type }) {
   );
   return (
     <div>
-      <div className={mediaContainer}>
-        {productsList.data.map((p, i) => {
-          const { id, title, img_path, release, rating } = p;
-          return (
-            <div key={i} className={mediaProduct} onClick={() => onProductClick(id)}>
-              <img className={mediaImg} data-src={img_path}/>
-              <Rating className={ratingArea} rating={rating} />
-              <p class={mediaTitle}>{title}</p>
-              <p class={mediaRelease}>{release.slice(0, 4)}</p>
-            </div>
-          )
-        })}
-      </div>
-      {productsList.fetching && (
-        <div>
-          <p>Loading...</p>
-        </div>
-      )}
+      <LazyLoadList
+        loading={productsList.fetching}
+        data={productsList.data}
+        onClick={onProductClick}
+      />
       <div ref={bottomRef}></div>
     </div>
-  )
-}
+  );
+};

@@ -35,8 +35,8 @@ export default function Register() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(userData)
     };
+    const url = `${process.env.REACT_APP_SERVER}/register`
     try {
-      const url = `${process.env.REACT_APP_SERVER}/register`
       const response = await fetch(url, requestInfo);
       const json = await response.json();
       if (response.status >= 400) {
@@ -48,7 +48,10 @@ export default function Register() {
         }
       } else {
         const dataToStore = { name: json.name, id: json.id, token: json.token };
-        localStorage.setItem('STORAGE_KEY', JSON.stringify(dataToStore));
+        localStorage.setItem(
+          process.env.REACT_APP_STORAGE_KEY,
+          JSON.stringify(dataToStore)
+        );
         userDispatch({type: 'SET_INFO', payload: { ...json }});
       }
     } catch (e) {

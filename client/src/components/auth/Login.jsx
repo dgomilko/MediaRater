@@ -28,8 +28,8 @@ export default function Login() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(userData)
     };
+    const url = `${process.env.REACT_APP_SERVER}/login`
     try {
-      const url = `${process.env.REACT_APP_SERVER}/login`
       const response = await fetch(url, requestInfo);
       const json = await response.json();
       if (response.status >= 400) {

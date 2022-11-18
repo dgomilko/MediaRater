@@ -3,19 +3,19 @@ import {
   useState,
   useReducer,
 } from 'react';
-import { useParams, useLocation } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import productsReducer from '../reducers/productsReduser';
 import pageReducer from '../reducers/pageReducer';
 
 export default function useFetchReviews(url) {
-  const location = useLocation();
+  const params = useParams();
   const [error, setError] = useState('');
   const [data, setData] = useState({});
   const [reviewsData, reviewsDispatch] =
     useReducer(productsReducer, { data: [] });
   const [pageData, pageDispatch] =
     useReducer(pageReducer, { page: 1 });
-  const { id } = useParams();
+  const { id } = params;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -40,7 +40,7 @@ export default function useFetchReviews(url) {
     };
 
     fetchData();
-  }, [location, pageData.page]);
+  }, [params, pageData.page]);
 
   useEffect(() => {
     if (!data.reviews) return;

@@ -4,7 +4,8 @@ from dao.product.ProductDao import ProductDao
 def product_dao_factory(
   name: str,
   specific_args: list[str],
-  model: db.Model
+  model: db.Model,
+  review_model: db.Model
 ):
   def add_new(data: dict) -> bool:
     speial_values = {key: data[key] for key in specific_args}
@@ -23,8 +24,13 @@ def product_dao_factory(
   def get_ids() -> list[dict]:
     return [x[0] for x in ProductDao.get_all_ids(model)]
 
-  def load(page: int) -> list[dict]:
-    return ProductDao.load_products(page, model)
+  def load(
+    page: int,
+    order: str ='desc',
+    filter: str = 'popular'
+  ) -> list[dict]:
+    return ProductDao \
+      .load_products(page, model, review_model, order, filter)
 
   def stats(pid: str) -> list[dict]:
     return ProductDao.get_stats(pid, model)
@@ -35,6 +41,6 @@ def product_dao_factory(
     'get_reviews': staticmethod(get_reviews),
     'get_ids': staticmethod(get_ids),
     'load': staticmethod(load),
-    'stats': staticmethod(stats)
+    'stats': staticmethod(stats),
   }
   return type(name, (ProductDao,), methods)

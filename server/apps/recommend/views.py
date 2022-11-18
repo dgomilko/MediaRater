@@ -16,9 +16,9 @@ def recommend_products(p_type: str) -> tuple[dict, int]:
   user_exists = UserDao.get_by_id(uid) is not None
   if not user_exists:
     return err_response(ErrMsg.NO_USER, HTTPStatus.NOT_FOUND)
-  reviews = UserDao.get_reviews(uid, p_type)
+  reviews = UserDao.get_reviews(uid, 1, p_type)
   if not reviews:
-    return err_response(ErrMsg.NO_RECS, HTTPStatus.NO_CONTENT)
+    return err_response(ErrMsg.NO_RECS, HTTPStatus.NOT_FOUND)
   task = get_recommendations.apply_async(args=[p_type, uid])
   return {'task_id': task.id }, HTTPStatus.OK
 

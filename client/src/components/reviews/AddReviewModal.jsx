@@ -37,8 +37,8 @@ export default function AddReviewModal({ closeFn, display, type, productId }) {
       },
       body: JSON.stringify(body),
     };
+    const url = `${process.env.REACT_APP_SERVER}/product/new-${type}-review`;
     try {
-      const url = `${process.env.REACT_APP_SERVER}/product/new-${type}-review`;
       const response = await fetch(url, requestInfo);
       const json = await response.json();
       if (response.status >= 400) {

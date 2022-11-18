@@ -24,8 +24,8 @@ export default function AccInfo() {
         'Authorization': `Bearer ${token}`,
       },
     };
+    const url = `${process.env.REACT_APP_SERVER}/logout`;
     try {
-      const url = `${process.env.REACT_APP_SERVER}/logout`;
       const response = await fetch(url, requestInfo);
       const json = await response.json();
       if (response.status >= 400) {
