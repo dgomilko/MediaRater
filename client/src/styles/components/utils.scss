@@ -57,3 +57,15 @@
   cursor: auto;
   background-color: gray;
 }
+
+.selector {
+  width: 100%;
+  padding: 7px;
+  border-radius: 10px;
+}
+
+.selector:focus {
+  outline: none;
+  border:1px solid v.$theme_blue;
+  border-width: 2px;
+}

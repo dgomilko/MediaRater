@@ -83,8 +83,8 @@ export default function Product({ type }) {
       )}
       <ProductNavbar />
       <Routes>
-        <Route path='' element={<ProductReviews />}/>
-        <Route path='stats' element={<ProductStats />}/>
+        <Route path='' element={<ProductReviews type={type} />}/>
+        <Route path='stats' element={<ProductStats type={type} />}/>
       </Routes>
     </div>
   );

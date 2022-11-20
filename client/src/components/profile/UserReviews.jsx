@@ -20,7 +20,7 @@ export default function UserReviews({ type }) {
     error,
     data
   } = useFetchReviews(
-    `${process.env.REACT_APP_SERVER}/user/${type}-reviews`
+    `${process.env.REACT_APP_SERVER}/user/${type}-reviews`, true
   );
 
   useEffect(() => {

@@ -26,7 +26,6 @@ export default function Recommendations({ type }) {
       const url = `${process.env.REACT_APP_SERVER}/recommend/rec-${type}s`;
       try {
         const response = await fetch(url, requestInfo);
-        console.log(response);
         const json = await response.json();
         if (response.status >= 400 || response.status === 204) {
           const message = json.message || 'Unknown server error';
@@ -54,7 +53,6 @@ export default function Recommendations({ type }) {
       try {
         const response = await fetch(url, requestInfo);
         const json = await response.json();
-        console.log(json);
         if (response.status >= 400) {
           const msg = json.status || 'Internal server error';
           throw new Error(msg);

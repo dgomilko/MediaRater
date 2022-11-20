@@ -1,0 +1,23 @@
+@use '../utils' as u;
+
+.horizontalWrapper {
+  @include u.flex(row);
+  max-width: 100%;
+  overflow-x: scroll;
+  scroll-behavior: smooth;
+
+  div {
+    padding: 8px;
+    border-radius: 4px;
+    margin: 0 4px;
+    white-space: nowrap;
+    width: 100px;
+  }
+}
+
+.horizontalWrapper::-webkit-scrollbar {
+  background: transparent;
+  -webkit-appearance: none;
+  width: 0;
+  height: 0;
+}

@@ -1,0 +1,25 @@
+@use '../utils.scss' as u;
+
+.chartWrapper {
+  @include u.flex(column, $align: center);
+  margin: 0;
+  width: 100%;
+}
+
+.optionsWrapper {
+  @include u.flex(row, $justify: center);
+  margin: 1%;
+  width: 300px;
+
+  input {
+    @extend .submitBtn;
+    width: 100px;
+    margin-left: 2%;
+  }
+}
+
+.optionsSelect {
+  @extend .selector;
+  width: 115px;
+  border: 2px solid black;
+}

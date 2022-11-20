@@ -1,64 +1,12 @@
-import React, {
-  useEffect,
-  useReducer,
-  useState,
-  useRef,
-  useCallback
-} from 'react';
-import LazyLoadList from './LazyLoadList';
+import React, { useEffect, useReducer, useRef, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import LazyLoadList from './LazyLoadList';
+import useProductsFetch from '../hooks/useProductsFetch.js';
 import productsReducer from '../reducers/productsReduser';
 import pageReducer from '../reducers/pageReducer';
 
-const useFetch = (url, pageData, dispatch, field) => {
-  const [items, setItems] = useState([]);
-  const [outOfContent, setOutOfContent] = useState(false);
-  const location = useLocation();
-
-  useEffect(() => {
-    if (outOfContent) return;
-    const fetchList = async page => {
-      const requestInfo = {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ page })
-      };
-      try {
-        const response = await fetch(url, requestInfo);
-        const data = await response.json();
-        if (response.status >= 400) {
-          if (response.status === 404 && data.message) {
-            setOutOfContent(true);
-          } else {
-            const message = data.message || 'Unknown server error';
-            throw new Error(message);
-          }
-        }
-        else {
-          setItems(data[field]);
-        }
-      } catch (e) {
-        console.error(e);
-      }
-    }
-    fetchList(pageData.page);
-  }, [dispatch, pageData.page]);
-
-  useEffect(() => {
-    setItems([]);
-    setOutOfContent(false);
-  }, [location]);
-
-  useEffect(() => {
-    if (outOfContent || !items.length) return;
-    dispatch({ type: 'FETCHING', payload: true });
-    dispatch({ type: 'LOAD', payload: items });
-    dispatch({ type: 'FETCHING', payload: false });
-  }, [items, outOfContent]);
-}
-
 export default function ProductList({ type }) {
-  const [pageData, pageDispatch] = useReducer(pageReducer, { page: 1 })
+  const [pageData, pageDispatch] = useReducer(pageReducer, { page: 0 })
   const [productsList, productsDispatch] = useReducer(
     productsReducer,
     { data: [], fetching: true }
@@ -68,7 +16,7 @@ export default function ProductList({ type }) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    pageDispatch({ type: 'CLEAR' });
+    pageDispatch({ type: 'CLEAR', payload: 0 });
     productsDispatch({ type: 'CLEAR' });
   }, [location]);
 
@@ -92,12 +40,23 @@ export default function ProductList({ type }) {
     if (bottomRef.current) bottomObserver(bottomRef.current);
   }, [bottomObserver, bottomRef]);
 
-  useFetch(
+  const { items, setItems, outOfContent, setOutOfContent } = useProductsFetch(
     `${process.env.REACT_APP_SERVER}/${type}`,
-    pageData,
-    productsDispatch,
-    'products'
+    pageData
   );
+
+  useEffect(() => {
+    setItems([]);
+    setOutOfContent(false);
+  }, [location]);
+
+  useEffect(() => {
+    if (outOfContent || !items.length) return;
+    productsDispatch({ type: 'FETCHING', payload: true });
+    productsDispatch({ type: 'LOAD', payload: items });
+    productsDispatch({ type: 'FETCHING', payload: false });
+  }, [items, outOfContent]);
+
   return (
     <div>
       <LazyLoadList

@@ -7,7 +7,7 @@ import { useParams } from 'react-router-dom';
 import productsReducer from '../reducers/productsReduser';
 import pageReducer from '../reducers/pageReducer';
 
-export default function useFetchReviews(url) {
+export default function useFetchReviews(url, onReload = false) {
   const params = useParams();
   const [error, setError] = useState('');
   const [data, setData] = useState({});
@@ -16,6 +16,8 @@ export default function useFetchReviews(url) {
   const [pageData, pageDispatch] =
     useReducer(pageReducer, { page: 1 });
   const { id } = params;
+  const deps = [pageData.page];
+  if (onReload) deps.push(params);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -40,7 +42,7 @@ export default function useFetchReviews(url) {
     };
 
     fetchData();
-  }, [params, pageData.page]);
+  }, deps);
 
   useEffect(() => {
     if (!data.reviews) return;

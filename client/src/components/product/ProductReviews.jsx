@@ -1,5 +1,5 @@
 import React from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import useFetchReviews from '../../hooks/useFetchReviews';
 import AccLogo from '../profile/AccLogo';
 import ReviewsList from '../reviews/ReviewsList';
@@ -10,10 +10,8 @@ import {
   username,
 } from '../../styles/components/product/ProductReviews.module.scss';
 
-export default function ProductReviews() {
-  const location = useLocation();
+export default function ProductReviews({ type }) {
   const navigate = useNavigate();
-  const type = location.pathname.split('/')[1];
 
   const { pageDispatch, reviewsData, error, data } = useFetchReviews(
     `${process.env.REACT_APP_SERVER}/product/${type}-reviews`

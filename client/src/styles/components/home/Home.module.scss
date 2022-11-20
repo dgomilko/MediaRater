@@ -1,0 +1,5 @@
+@use '../utils' as u;
+
+.productWrapper {
+  @include u.flex(column);
+}

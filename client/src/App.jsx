@@ -5,7 +5,7 @@ import { pagewrap } from './styles/components/App.module.scss'
 import Footer from './components/Footer';
 import ProductList from './components/ProductList';
 import Header from './components/header/Header';
-import Home from './components/Home';
+import Home from './components/home/Home';
 import Register from './components/auth/Register';
 import Login from './components/auth/Login';
 import Profile from './components/profile/Profile';

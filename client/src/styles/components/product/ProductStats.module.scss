@@ -1,0 +1,12 @@
+@use '../utils.scss' as u;
+
+.statsWrapper {
+  @include u.flex(column, $align: center);
+  padding: 2%;
+}
+
+.optionsSelect {
+  @extend .selector;
+  width: 215px;
+  border: 2px solid black;
+}

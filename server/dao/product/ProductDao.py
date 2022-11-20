@@ -116,7 +116,10 @@ class ProductDao(Dao):
         model,
         func.avg(review_model.rate).label('rating'),
       ).outerjoin(review_model)
-    result = filters[filter](query).slice(offset, limit).all()
+    result = filters[filter](query) \
+      .distinct() \
+      .slice(offset, limit) \
+      .all()
     if not result: return None
     return [{
       **product_short_mapper(res[0]),
