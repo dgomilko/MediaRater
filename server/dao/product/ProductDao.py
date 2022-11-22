@@ -49,33 +49,6 @@ class ProductDao(Dao):
     common['rating'] = rating
     common['reviews'] = len(result.reviews.all())
     return (result, common)
-
-  # @staticmethod
-  # def filter_products_by_rating(
-  #   model: db.Model,
-  #   review_model: db.Model,
-  #   order='desc',
-  #   filter='popular'
-  # ) -> tuple[list[dict], bool]:
-  #   orderFn = globals()[order]
-  #   filters = {
-  #     'title': lambda query: query.outerjoin(MediaProduct)
-  #       .group_by(model.id, MediaProduct.title)
-  #       .order_by(orderFn(MediaProduct.title)),
-  #     'rating': lambda query: query.group_by(model.id)
-  #       .order_by(nullslast(orderFn('rating'))),
-  #     'popular': lambda query: query.group_by(model.id)
-  #       .order_by(nullslast(orderFn(func.count(review_model.rate)))),
-  #   }
-  #   query = db.session.query(
-  #       model,
-  #       func.avg(review_model.rate).label('rating'),
-  #     ).outerjoin(review_model)
-  #   result = filters[filter](query).all()
-  #   return [{
-  #     **product_short_mapper(res[0]),
-  #     'rating': round(float(res[1]), 1) if res[1] else -1
-  #   } for res in result]
   
   @staticmethod
   @limit_per_page(10)
@@ -102,15 +75,16 @@ class ProductDao(Dao):
     results_per_page = 20
     offset = results_per_page * (page - 1)
     limit = results_per_page * page
-    orderFn = globals()[order]
+    order_fn = globals()[order]
+    null_order = nullsfirst if order == 'asc' else nullslast;
     filters = {
       'title': lambda query: query.outerjoin(MediaProduct)
         .group_by(model.id, MediaProduct.title)
-        .order_by(orderFn(MediaProduct.title)),
+        .order_by(order_fn(MediaProduct.title)),
       'rating': lambda query: query.group_by(model.id)
-        .order_by(nullslast(orderFn('rating'))),
+        .order_by(null_order(order_fn('rating'))),
       'popular': lambda query: query.group_by(model.id)
-        .order_by(nullslast(orderFn(func.count(review_model.rate)))),
+        .order_by(null_order(order_fn(func.count(review_model.rate)))),
     }
     query = db.session.query(
         model,
@@ -123,7 +97,7 @@ class ProductDao(Dao):
     if not result: return None
     return [{
       **product_short_mapper(res[0]),
-      'rating': round(float(res[1]), 1) if res[1] else -1
+      'rating': round(float(res[1]), 1) if res[1] is not None else -1
     } for res in result]
 
   @staticmethod

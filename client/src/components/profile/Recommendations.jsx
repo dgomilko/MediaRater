@@ -72,9 +72,13 @@ export default function Recommendations({ type }) {
 
   const onProductClick = id => navigate(`/${type}/${id}`);
 
-  return <LazyLoadList
-    loading={loading}
-    data={recs}
-    onClick={onProductClick}
-  />;
+  return (
+    <div style={{'display': 'flex', 'justifyContent': 'center'}}>
+      <LazyLoadList
+        loading={loading}
+        data={recs}
+        onClick={onProductClick}
+      />
+    </div>
+  );
 };

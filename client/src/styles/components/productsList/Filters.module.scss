@@ -1,0 +1,60 @@
+@use '../utils' as u;
+
+.mainWrapper {
+  margin: 0;
+  padding: 0;
+  margin-top: 4%;
+  @include u.flex(column, $align: center);
+}
+
+.filterWrapper {
+  margin-top: 4%;
+  padding: 2% 4%;
+  border-radius: 20px;
+  border: 3px solid black;
+  height: fit-content;
+  width: 200px;
+}
+
+.header {
+  @include u.flex(row, $justify: space-between);
+  font-size: 20px;
+
+  span {
+    cursor: pointer;
+    font-size: 22px;
+  }
+
+  p {
+    margin: 0;
+  }
+}
+
+.filterAndLabel {
+  @include u.flex(column);
+  padding: 3% 0;
+
+  span {
+    font-size: 17px;
+    color: rgba(0, 0, 0, 0.7);
+    font-weight: 100;
+  }
+
+  select {
+    @extend .selector;
+    margin-top: 1%;
+    border: 2px solid black;
+  }
+}
+
+.filters {
+  border-top: 1px solid black;
+  margin-top: 2%;
+  padding-top: 1%;
+}
+
+.searchBtn {
+  @extend .submitBtn;
+  width: 90px;
+  margin-top: 2%;
+}

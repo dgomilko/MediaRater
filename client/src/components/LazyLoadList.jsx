@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useCallback } from 'react';
 import Rating from './product/Rating';
 import {
+  mainWrapper,
   mediaContainer,
   mediaProduct,
   mediaImg,
@@ -35,7 +36,7 @@ export default function LazyLoadList({ loading, data, onClick }) {
   }, [imgObserver, imgRef, data]);
 
   return (
-    <div>
+    <div className={mainWrapper}>
       <div className={mediaContainer}>
         {data.map(p => {
           const { id, title, img_path, release, rating } = p;

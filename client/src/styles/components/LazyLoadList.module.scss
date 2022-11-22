@@ -3,7 +3,7 @@
 .mediaContainer {
   @include u.flex(row, $justify: center);
   flex-wrap: wrap;
-  margin: 3% 5%;
+  margin: 3% auto;
 }
 
 .mediaProduct {
@@ -48,4 +48,8 @@
 
 .mediaRelease {
   color: gray;
+}
+
+.mainWrapper {
+  max-width: 80%;
 }

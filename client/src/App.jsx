@@ -3,7 +3,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { UserProvider } from './contexts/UserContext';
 import { pagewrap } from './styles/components/App.module.scss'
 import Footer from './components/Footer';
-import ProductList from './components/ProductList';
+import ProductList from './components/productList/ProductList';
 import Header from './components/header/Header';
 import Home from './components/home/Home';
 import Register from './components/auth/Register';

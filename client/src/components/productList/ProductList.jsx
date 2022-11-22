@@ -1,11 +1,16 @@
-import React, { useEffect, useReducer, useRef, useCallback } from 'react';
+import React, { useEffect, useReducer, useRef, useCallback, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import LazyLoadList from './LazyLoadList';
-import useProductsFetch from '../hooks/useProductsFetch.js';
-import productsReducer from '../reducers/productsReduser';
-import pageReducer from '../reducers/pageReducer';
+import Filters from './Filters';
+import LazyLoadList from '../LazyLoadList';
+import useProductsFetch from '../../hooks/useProductsFetch.js';
+import productsReducer from '../../reducers/productsReduser';
+import pageReducer from '../../reducers/pageReducer';
+import {
+  mainWrapper,
+} from '../../styles/components/productsList/ProductList.module.scss';
 
 export default function ProductList({ type }) {
+  const [options, setOptions] = useState({});
   const [pageData, pageDispatch] = useReducer(pageReducer, { page: 0 })
   const [productsList, productsDispatch] = useReducer(
     productsReducer,
@@ -15,10 +20,18 @@ export default function ProductList({ type }) {
   const location = useLocation();
   const navigate = useNavigate();
 
-  useEffect(() => {
+  const resetPage = () => {
     pageDispatch({ type: 'CLEAR', payload: 0 });
     productsDispatch({ type: 'CLEAR' });
-  }, [location]);
+  }
+
+  useEffect(resetPage, [location]);
+
+  const { items, setItems, outOfContent, setOutOfContent } = useProductsFetch(
+    `${process.env.REACT_APP_SERVER}/${type}`,
+    pageData,
+    options
+  );
 
   const bottomObserverClb = node => {
     new IntersectionObserver(elements => elements.forEach(e => {
@@ -28,10 +41,7 @@ export default function ProductList({ type }) {
     ).observe(node);
   };
 
-  const bottomObserver = useCallback(
-    bottomObserverClb,
-    [pageDispatch]
-  );
+  const bottomObserver = useCallback(bottomObserverClb, [pageDispatch]);
 
   const onProductClick = id =>
     navigate(`/${type.slice(0, type.length - 1)}/${id}`);
@@ -40,13 +50,9 @@ export default function ProductList({ type }) {
     if (bottomRef.current) bottomObserver(bottomRef.current);
   }, [bottomObserver, bottomRef]);
 
-  const { items, setItems, outOfContent, setOutOfContent } = useProductsFetch(
-    `${process.env.REACT_APP_SERVER}/${type}`,
-    pageData
-  );
-
   useEffect(() => {
     setItems([]);
+    setOptions({});
     setOutOfContent(false);
   }, [location]);
 
@@ -59,11 +65,18 @@ export default function ProductList({ type }) {
 
   return (
     <div>
-      <LazyLoadList
-        loading={productsList.fetching}
-        data={productsList.data}
-        onClick={onProductClick}
-      />
+      <div className={mainWrapper}>
+        <Filters
+          setOptions={setOptions}
+          options={options}
+          onClick={resetPage}
+        />
+        <LazyLoadList
+          loading={productsList.fetching}
+          data={productsList.data}
+          onClick={onProductClick}
+        />
+      </div>
       <div ref={bottomRef}></div>
     </div>
   );

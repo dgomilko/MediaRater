@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-export default function useProductsFetch(url, pageData) {
+export default function useProductsFetch(url, pageData, options={}) {
   const [items, setItems] = useState([]);
   const [outOfContent, setOutOfContent] = useState(false);
 
@@ -10,7 +10,7 @@ export default function useProductsFetch(url, pageData) {
       const requestInfo = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ page })
+        body: JSON.stringify({ page, ...options })
       };
       try {
         const response = await fetch(url, requestInfo);

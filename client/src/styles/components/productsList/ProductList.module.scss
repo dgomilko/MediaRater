@@ -1,0 +1,5 @@
+@use '../utils' as u;
+
+.mainWrapper {
+  @include u.flex(row, $justify: space-evenly);
+}

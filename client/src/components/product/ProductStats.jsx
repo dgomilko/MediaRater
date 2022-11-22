@@ -26,7 +26,6 @@ export default function ProductStats({ type }) {
       try {
         const response = await fetch(url, requestInfo);
         const json = await response.json();
-        console.log(json);
         if (response.status >= 400) {
           const message = json.message || 'Unknown server error';
           throw new Error(message);

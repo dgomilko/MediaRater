@@ -1,17 +1,17 @@
 @use '../utils' as u;
+@use '../../variables' as v;
 
 .horizontalWrapper {
   @include u.flex(row);
   max-width: 100%;
   overflow-x: scroll;
   scroll-behavior: smooth;
+  border-top: v.$delim;
+  border-bottom: v.$delim;
 
   div {
     padding: 8px;
-    border-radius: 4px;
     margin: 0 4px;
-    white-space: nowrap;
-    width: 100px;
   }
 }
 
@@ -20,4 +20,37 @@
   -webkit-appearance: none;
   width: 0;
   height: 0;
+}
+
+.productCard {
+  cursor: pointer;
+  width: 160px;
+  position: relative;
+
+  img {
+    width: 145px;
+    height: 220px;
+    border-radius: 15px;
+  }
+
+  p {
+    margin: 0;
+    text-align: center;
+    font-weight: 600;
+  }
+}
+
+.productCard:hover {
+  transform: scale(1.05);
+}
+
+.rate {
+  @include u.circle(25px);
+  position: absolute;
+  left: calc(145px * 0.05);
+  top: calc(220px * 0.8);
+
+  span {
+    font-size: 20px;
+  }
 }
