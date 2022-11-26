@@ -1,0 +1,5 @@
+@use 'utils' as u;
+
+.errWrapper {
+  @extend .msgWrapper;
+}

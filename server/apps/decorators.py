@@ -1,7 +1,7 @@
 import functools
-from http import HTTPStatus
-import json
 from flask import request
+from http import HTTPStatus
+from dao.user.userDao import UserDao
 from dao.token.tokenDao import TokenDao
 from security_utils.tokens import decode_token
 from apps.err_messages import err_response, ErrMsg
@@ -43,5 +43,8 @@ def authorization_needed(func: callable) -> callable:
     success, val = decode_token(token)
     if not success:
       return err_response(val, HTTPStatus.BAD_REQUEST)
+    found_user = UserDao.get_by_id(val)
+    if not found_user:
+      return err_response(ErrMsg.NO_USER, HTTPStatus.NOT_FOUND)
     return func(*args, **kwargs)
   return wrapped

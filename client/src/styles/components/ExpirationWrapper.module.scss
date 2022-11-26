@@ -1,0 +1,24 @@
+@use 'utils' as u;
+
+.modal {
+  background-color: white;
+  padding: 0;
+  margin: 5% auto;
+  max-width: 340px;
+  height: 25%;
+  border: 1px solid black;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.content {
+  @include u.flex(column, $align: center, $justify: center);
+  margin-top: 4%;
+  text-align: center;
+  padding: 2%;
+  font-size: 18px;
+
+  input {
+    margin-top: 5%;
+  }
+}

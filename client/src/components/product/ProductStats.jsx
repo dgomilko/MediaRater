@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import Loading from '../Loading';
+import Error from '../Error';
 import { getAgeGaps, generateColor, getTopCountries } from './productStatsUtils';
 import Chart from './Chart';
 import {
@@ -8,6 +10,8 @@ import {
 } from '../../styles/components/product/ProductStats.module.scss'
 
 export default function ProductStats({ type }) {
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const params = useParams();
   const [stats, setStats] = useState([]);
   const [options, setOptions] = useState({});
@@ -26,6 +30,7 @@ export default function ProductStats({ type }) {
       try {
         const response = await fetch(url, requestInfo);
         const json = await response.json();
+        setLoading(false);
         if (response.status >= 400) {
           const message = json.message || 'Unknown server error';
           throw new Error(message);
@@ -33,7 +38,7 @@ export default function ProductStats({ type }) {
           setStats(json.stats);
         }
       } catch (e) {
-        console.error(e.message);
+        setError(e);
       }
     };
     
@@ -41,7 +46,7 @@ export default function ProductStats({ type }) {
   }, [id]);
   
   useEffect(() => {
-    if (!stats.length) return;
+    if (!stats?.length) return;
     const ageGaps = getAgeGaps();
     const ageLabels = ageGaps.map(gap => gap.join('-'));
     const genderLabels = ['female', 'male'];
@@ -129,21 +134,22 @@ export default function ProductStats({ type }) {
     setOptions(optionsDict);
   }, [stats]);
   
-  return (
-    <div className={statsWrapper}>
-      <select
-        className={optionsSelect}
-        value={chartOption}
-        onChange={e => setChartOption(e.target.value)}
-      >
-        {Object.keys(options).map(val => (
-          <option value={val}>{val}</option>
-        ))}
-      </select>
-      <Chart
-        data={options[chartOption]?.chartData}
-        chartOptions={options[chartOption]?.chartTypes}
-      />
-    </div>
+  return (loading ? <div style={{'height': '150px'}}><Loading /></div> :
+    error ? <Error msg={error.message} /> :
+      <div className={statsWrapper}>
+        <select
+          className={optionsSelect}
+          value={chartOption}
+          onChange={e => setChartOption(e.target.value)}
+        >
+          {Object.keys(options).map(val => (
+            <option value={val}>{val}</option>
+          ))}
+        </select>
+        <Chart
+          data={options[chartOption]?.chartData}
+          chartOptions={options[chartOption]?.chartTypes}
+        />
+      </div>
   );
 };

@@ -69,3 +69,12 @@
   border:1px solid v.$theme_blue;
   border-width: 2px;
 }
+
+.msgWrapper {
+  @include flex(column, $align: center, $justify: center);
+  margin-top: 10%;
+  font-size: 30px;
+  font-weight: 600;
+  color: v.$theme-blue;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.6);
+}

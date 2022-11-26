@@ -1,7 +1,8 @@
-import React, { useContext } from 'react';
-import InputField from './InputField';
-import { UserContext } from '../../contexts/UserContext';
+import React, { useContext, useState } from 'react';
 import { Navigate } from 'react-router-dom'
+import InputField from './InputField';
+import Error from '../Error';
+import { UserContext } from '../../contexts/UserContext';
 import useFormValidation from '../../hooks/useFormValidation';
 import { signInVerifiers } from '../../verifiers/signInVerifiers';
 import {
@@ -19,6 +20,7 @@ export default function Login() {
     errors,
     setErrors
   } = useFormValidation(signInVerifiers);
+  const [error, setError] = useState('');
 
   const handleSubmit = async e => {
     e.preventDefault();
@@ -47,10 +49,10 @@ export default function Login() {
           process.env.REACT_APP_STORAGE_KEY,
           JSON.stringify(dataToStore)
         );
-        userDispatch({type: 'SET_INFO', payload: { ...json }});
+        userDispatch({type: 'SET_INFO', payload: { ...json, expired: false }});
       }
     } catch (e) {
-      console.error(e);
+      setError(e);
     }
   };
   
@@ -58,7 +60,7 @@ export default function Login() {
   const emptyFields = Object.keys(data).length !==
     Object.keys(signInVerifiers.validations).length;
   const submitImpossible = errorsFound || emptyFields;
-  return (
+  return (error ? <Error msg={error.message} /> :
     <div className={areaWrapper}>
       <p className={title}>Sign in to your account</p>
       <form onSubmit={handleSubmit} >
@@ -74,7 +76,12 @@ export default function Login() {
           onChange={handleChange('password') }
           warning={errors['password']}
         />
-        <input className={loginBtn} type='submit' value="Login" disabled={submitImpossible} />
+        <input
+          className={loginBtn}
+          type='submit'
+          value='Login'
+          disabled={submitImpossible}
+        />
       </form>
     </div>
   );

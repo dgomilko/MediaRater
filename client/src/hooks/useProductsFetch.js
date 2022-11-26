@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 
 export default function useProductsFetch(url, pageData, options={}) {
+  const [error, setError] = useState('');
   const [items, setItems] = useState([]);
   const [outOfContent, setOutOfContent] = useState(false);
 
@@ -27,11 +28,11 @@ export default function useProductsFetch(url, pageData, options={}) {
           setItems(data.products);
         }
       } catch (e) {
-        console.error(e);
+        setError(e);
       }
     }
     fetchList(pageData.page);
   }, [pageData.page]);
 
-  return { items, setItems, outOfContent, setOutOfContent };
+  return { items, setItems, outOfContent, setOutOfContent, error, setError };
 }

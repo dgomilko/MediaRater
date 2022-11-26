@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useCallback } from 'react';
 import Rating from './product/Rating';
+import Loading from './Loading';
 import {
   mainWrapper,
   mediaContainer,
@@ -12,7 +13,6 @@ import {
 
 export default function LazyLoadList({ loading, data, onClick }) {
   const imgRef = useRef(null);
-
   const imgObserverClb = node => {
     const observer = new IntersectionObserver(elements => {
       elements.forEach(e => {
@@ -35,7 +35,7 @@ export default function LazyLoadList({ loading, data, onClick }) {
       imgRef.current.forEach(img => imgObserver(img));
   }, [imgObserver, imgRef, data]);
 
-  return (
+  return (loading ? <div style={{'width': '80%'}}><Loading /></div> :
     <div className={mainWrapper}>
       <div className={mediaContainer}>
         {data.map(p => {
@@ -50,11 +50,6 @@ export default function LazyLoadList({ loading, data, onClick }) {
           )
         })}
       </div>
-      {loading && (
-        <div>
-          <p>Loading...</p>
-        </div>
-      )}
     </div>
   );
 };

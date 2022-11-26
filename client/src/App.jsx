@@ -7,12 +7,27 @@ import ProductList from './components/productList/ProductList';
 import Header from './components/header/Header';
 import Home from './components/home/Home';
 import Register from './components/auth/Register';
+import ExpirationWrapper from './components/ExpirationWrapper';
 import Login from './components/auth/Login';
 import Profile from './components/profile/Profile';
 import Product from './components/product/Product';
+import Error from './components/Error';
 import './styles/styles.scss';
 
 export default function App() {
+  const routes = {
+    '/': Home,
+    '/login': Login,
+    '/register': Register,
+    '/user/:id/*': Profile
+  };
+
+  const wrapped = El => (
+    <ExpirationWrapper>
+      <El />
+    </ExpirationWrapper>
+  );
+
   return (
     <div>
       <div className={pagewrap}>
@@ -20,15 +35,23 @@ export default function App() {
           <BrowserRouter>
             <Header />
             <Routes>
-              <Route exact path='/' element={ <Home /> } />
-              <Route path='/login' element={ <Login /> } />
-              <Route path='/register' element={ <Register /> } />
-              <Route path='/user/:id/*' element={ <Profile /> } />
+              <Route path='*' element={ <Error msg="Couldn't find this page" /> } />
+              {Object.entries(routes).map(([path, El]) => (
+                <Route path={path} element={wrapped(El)}/>
+              ))}
               {['movies', 'shows', 'books'].map(type => (
-                <Route path={`/${type}`} element={ <ProductList type={type} /> } />
+                <Route path={`/${type}`} element={
+                  <ExpirationWrapper>
+                    <ProductList type={type} />
+                  </ExpirationWrapper> }
+                />
               ))}
               {['movie', 'show', 'book'].map(type => (
-                <Route path={`/${type}/:id/*`} element={ <Product type={type} /> } />
+                <Route path={`/${type}/:id/*`} element={
+                  <ExpirationWrapper>
+                    <Product type={type} />
+                  </ExpirationWrapper> }
+                />
               ))}
             </Routes>
           </BrowserRouter>

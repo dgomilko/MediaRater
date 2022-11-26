@@ -4,6 +4,7 @@ import { UserContext } from '../contexts/UserContext';
 
 export default function useDescriptionFetch(userParam, route) {
   const { userState } = useContext(UserContext);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [data, setData] = useState({});
   const { id } = useParams();
@@ -21,6 +22,7 @@ export default function useDescriptionFetch(userParam, route) {
       try {
         const response = await fetch(url, requestInfo);
         const json = await response.json();
+        setLoading(false);
         if (response.status >= 400) {
           const message = json.message || 'Unknown server error';
           throw new Error(message); 
@@ -28,12 +30,12 @@ export default function useDescriptionFetch(userParam, route) {
           setData(json);
         }
       } catch (e) {
-        setError(e.message);
+        setError(e);
       };
     };
   
     fetchData();
   }, [userState]);
 
-  return { data, error };
+  return { data, error, loading };
 };

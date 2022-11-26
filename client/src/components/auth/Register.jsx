@@ -1,7 +1,8 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
+import { Navigate } from 'react-router-dom'
+import Error from '../Error';
 import InputField from './InputField';
 import { UserContext } from '../../contexts/UserContext';
-import { Navigate } from 'react-router-dom'
 import useFormValidation from '../../hooks/useFormValidation';
 import { signUpVerifiers } from '../../verifiers/signUpVerifiers';
 import CountrySelector from './countrySelector/CountrySelector';
@@ -22,6 +23,7 @@ export default function Register() {
     errors,
     setErrors
   } = useFormValidation(signUpVerifiers);
+  const [error, setError] = useState('');
 
   const handleSubmit = async e => {
     e.preventDefault();
@@ -52,10 +54,10 @@ export default function Register() {
           process.env.REACT_APP_STORAGE_KEY,
           JSON.stringify(dataToStore)
         );
-        userDispatch({type: 'SET_INFO', payload: { ...json }});
+        userDispatch({type: 'SET_INFO', payload: { ...json, expired: false }});
       }
     } catch (e) {
-      console.error(e);
+      setError(e);
     }
   };
   
@@ -63,7 +65,7 @@ export default function Register() {
   const emptyFields = Object.keys(data).length !==
     Object.keys(signUpVerifiers.validations).length;
   const submitImpossible = errorsFound || emptyFields;
-  return (
+  return (error ? <Error msg={error.message} /> :
     <div className={areaWrapper}>
       <p className={title}>Sign up for an account</p>
       <form onSubmit={handleSubmit} >

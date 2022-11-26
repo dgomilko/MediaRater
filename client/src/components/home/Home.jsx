@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import Loading from '../Loading';
 import Scrollable from './Scrollable';
 import useProductsFetch from '../../hooks/useProductsFetch';
 import {
@@ -11,12 +12,21 @@ import {
 
 export default function Home() {
   const types = ['Movies', 'Shows', 'Books'];
+  const [loading, setLoading] = useState([...Array(types.length)]
+    .map(() => true));
   const products = types.map(type => useProductsFetch(
       `${process.env.REACT_APP_SERVER}/${type.toLowerCase()}`,
       { page: 1 }
     ).items
   );
 
+  useEffect(() => {
+    const someLoaded = products.filter(p => p.length).length;
+    const allLoaded = loading.filter(l => !l).length === types.length;
+    if (!someLoaded || allLoaded) return;
+    setLoading(products.map(p => !p.length));
+  }, [products]);
+  
   return (
     <div className={listsWrapper}>
       <div className={heading}>
@@ -26,9 +36,9 @@ export default function Home() {
       {products.map((arr, i) => (
         <div className={productWrapper}>
           <span className={typeTitle}>{types[i]}:</span>
-          <Scrollable data={arr} type={types[i]} />
+          {loading[i] ? <Loading /> : <Scrollable data={arr} type={types[i]} />}
         </div>
       ))}
     </div>
   );
-}
+};

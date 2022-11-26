@@ -1,8 +1,9 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import useFetchReviews from '../../hooks/useFetchReviews';
-import AccLogo from '../profile/AccLogo';
 import ReviewsList from '../reviews/ReviewsList';
+import AccLogo from '../profile/AccLogo';
+import Loading from '../Loading';
 import {
   authorWrapper,
   accLogo,
@@ -13,7 +14,7 @@ import {
 export default function ProductReviews({ type }) {
   const navigate = useNavigate();
 
-  const { pageDispatch, reviewsData, error, data } = useFetchReviews(
+  const { pageDispatch, reviewsData, error, data, loading } = useFetchReviews(
     `${process.env.REACT_APP_SERVER}/product/${type}-reviews`
   );
 
@@ -29,11 +30,12 @@ export default function ProductReviews({ type }) {
     </div>
   );
 
-  return <ReviewsList
-    header={reviewHeader}
-    data={reviewsData.data}
-    available={data.next_available}
-    error={error}
-    dispatch={pageDispatch}
-  />;
+  return loading ? <div style={{'height': '150px'}}><Loading /></div> :
+    <ReviewsList
+      header={reviewHeader}
+      data={reviewsData.data}
+      available={data.next_available}
+      error={error}
+      dispatch={pageDispatch}
+    />;
 };

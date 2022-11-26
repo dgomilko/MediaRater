@@ -48,8 +48,7 @@ export default function Filters({ setOptions, options, onClick }) {
   const onSearchClick = () => {
     setPrevOptions({ ...options });
     onClick();
-    console.log({options, prevOptions});
-  }
+  };
 
   return (
     <div className={mainWrapper}>

@@ -9,6 +9,7 @@ import pageReducer from '../reducers/pageReducer';
 
 export default function useFetchReviews(url, onReload = false) {
   const params = useParams();
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [data, setData] = useState({});
   const [reviewsData, reviewsDispatch] =
@@ -30,6 +31,7 @@ export default function useFetchReviews(url, onReload = false) {
       try {
         const response = await fetch(url, requestInfo);
         const json = await response.json();
+        setLoading(false);
         if (response.status >= 400) {
           const message = json.message || 'Unknown server error';
           throw new Error(message);
@@ -37,7 +39,7 @@ export default function useFetchReviews(url, onReload = false) {
           setData(json);
         }
       } catch (e) {
-        setError(e.message);
+        setError(e);
       };
     };
 
@@ -55,6 +57,8 @@ export default function useFetchReviews(url, onReload = false) {
     reviewsDispatch,
     reviewsData,
     error,
-    data
+    data,
+    loading,
+    setLoading,
   };
 };

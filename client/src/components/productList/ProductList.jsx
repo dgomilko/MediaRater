@@ -1,5 +1,6 @@
 import React, { useEffect, useReducer, useRef, useCallback, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import Error from '../Error';
 import Filters from './Filters';
 import LazyLoadList from '../LazyLoadList';
 import useProductsFetch from '../../hooks/useProductsFetch.js';
@@ -23,11 +24,19 @@ export default function ProductList({ type }) {
   const resetPage = () => {
     pageDispatch({ type: 'CLEAR', payload: 0 });
     productsDispatch({ type: 'CLEAR' });
+    setError('');
   }
 
   useEffect(resetPage, [location]);
 
-  const { items, setItems, outOfContent, setOutOfContent } = useProductsFetch(
+  const {
+    items,
+    setItems,
+    outOfContent,
+    setOutOfContent,
+    error,
+    setError
+  } = useProductsFetch(
     `${process.env.REACT_APP_SERVER}/${type}`,
     pageData,
     options
@@ -63,7 +72,7 @@ export default function ProductList({ type }) {
     productsDispatch({ type: 'FETCHING', payload: false });
   }, [items, outOfContent]);
 
-  return (
+  return (error ? <Error msg={error.message} /> :
     <div>
       <div className={mainWrapper}>
         <Filters

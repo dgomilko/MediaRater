@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
-import useFetchReviews from '../../hooks/useFetchReviews';
 import { useLocation, useNavigate } from 'react-router-dom';
+import useFetchReviews from '../../hooks/useFetchReviews';
 import ReviewsList from '../reviews/ReviewsList';
+import Loading from '../Loading';
 import {
   authorWrapper,
   logoWrapper,
-  username,
   title
 } from '../../styles/components/product/ProductReviews.module.scss';
 
@@ -18,13 +18,16 @@ export default function UserReviews({ type }) {
     reviewsDispatch,
     reviewsData,
     error,
-    data
+    data,
+    loading,
+    setLoading
   } = useFetchReviews(
     `${process.env.REACT_APP_SERVER}/user/${type}-reviews`, true
   );
 
   useEffect(() => {
     setError('');
+    setLoading(true);
     reviewsDispatch({type: 'CLEAR'});
     pageDispatch({type: 'CLEAR'});
   }, [location]);
@@ -45,7 +48,7 @@ export default function UserReviews({ type }) {
     </div>
   );
   
-  return <ReviewsList
+  return loading ? <Loading /> : <ReviewsList
     header={reviewHeader}
     data={reviewsData.data}
     available={data.next_available}

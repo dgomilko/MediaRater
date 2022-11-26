@@ -2,11 +2,10 @@ import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../../contexts/UserContext';
 import StarsRate from './StarsRate';
+import Modal from '../Modal';
+import Error from '../Error';
 import {
-  modalWrapper,
   modal,
-  header,
-  close,
   textbox,
   rateWrapper,
   textWrapper,
@@ -15,6 +14,7 @@ import {
 } from '../../styles/components/reviews/AddReviewModal.module.scss';
 
 export default function AddReviewModal({ closeFn, display, type, productId }) {
+  const [error, setError] = useState('');
   const [rating, setRating] = useState(0);
   const [text, setText] = useState('');
   const { userState, userDispatch } = useContext(UserContext);
@@ -42,46 +42,42 @@ export default function AddReviewModal({ closeFn, display, type, productId }) {
       const response = await fetch(url, requestInfo);
       const json = await response.json();
       if (response.status >= 400) {
-        const message = json.message || 'Unknown server error';
         closeFn();
+        if (json.message === 'Signature expired')
+          userDispatch({type: 'SET_INFO', payload: { expired: true }});
+        const message = json.message || 'Unknown server error';
         throw new Error(message);
       } else {
         navigate(`/${type}/${json.product_id}`);
-        userDispatch({type: 'SET_INFO', payload: {id: json.user_id}});
+        userDispatch({
+          type: 'SET_INFO',
+          payload: { id: json.user_id, expired: false }
+        });
         closeFn();
       }
     } catch (e) {
-      console.error(e);
+      setError(e);
     }
   };
 
-  const style = { 
-    display: display ? 'block' : 'none'
-  };
-
-  const closeModal = e => {
-    e.stopPropagation();
-    closeFn();
-  };
-
-  return (
-    <div className={modalWrapper} style={style}>
-      <div className={modal} onClick={e => e.stopPropagation()}>
-        <div className={header}>
-          <span className={close} onClick={closeModal}>&times;</span>
-        </div>
-        <div className={rateWrapper}>
-          <span>Rate this content:</span>
-          <StarsRate rating={rating} setRating={setRating} />
-        </div>
-        <div className={blockWrapper}>
-          <div className={textWrapper}>
-            <span>Your review:</span>
-            <textarea class={textbox} onChange={(e) => setText(e.target.value)}/>
-          </div>
-          <input type='button' className={addReview} onClick={handleAddReview} value='Add review'/>
-        </div>
+  return (error ? <Error msg={error.message} /> :
+    <Modal display={display} closeFn={closeFn} className={modal}>
+      <div className={rateWrapper}>
+        <span>Rate this content:</span>
+        <StarsRate rating={rating} setRating={setRating} />
       </div>
-    </div>
- );
+      <div className={blockWrapper}>
+        <div className={textWrapper}>
+          <span>Your review:</span>
+          <textarea class={textbox} onChange={(e) => setText(e.target.value)}/>
+        </div>
+        <input
+          type='button'
+          className={addReview}
+          onClick={handleAddReview}
+          value='Add review'
+        />
+      </div>
+    </Modal>
+  );
 };

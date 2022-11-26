@@ -1,15 +1,20 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, Navigate } from 'react-router-dom';
+import Error from '../Error';
+import Loading from '../Loading';
 import LazyLoadList from '../LazyLoadList';
 import { UserContext } from '../../contexts/UserContext';
 
 export default function Recommendations({ type }) {
+  const { userState, userDispatch } = useContext(UserContext);
   const location = useLocation();
+  const id = location.pathname.split('/')[2];
+  if (userState?.id !== id) return <Navigate to={`/user/${id}`} />;
+  const [error, setError] = useState('');
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [recs, setRecs] = useState([]);
   const [taskId, setTaskId] = useState('');
-  const { userState } = useContext(UserContext);
 
   useEffect(() => {
     const requestRecs = async () => {
@@ -27,17 +32,20 @@ export default function Recommendations({ type }) {
       try {
         const response = await fetch(url, requestInfo);
         const json = await response.json();
-        if (response.status >= 400 || response.status === 204) {
+        if (response.status >= 400) {
+          if (json.message === 'Signature expired')
+            userDispatch({type: 'SET_INFO', payload: { expired: true }});
           const message = json.message || 'Unknown server error';
           throw new Error(message);
         } else {
           setTaskId(json.task_id);
         }
       } catch (e) {
-        console.error(e);
+        setError(e);
       }
     };
 
+    setLoading(true);
     requestRecs();
   }, [userState, location]);
 
@@ -62,8 +70,9 @@ export default function Recommendations({ type }) {
           setRecs(json.result);
           setLoading(false);
         }
-      } catch {
-        console.error(e);
+      } catch (e) {
+        setError(e);
+        setLoading(false);
       }
     };
 
@@ -72,10 +81,10 @@ export default function Recommendations({ type }) {
 
   const onProductClick = id => navigate(`/${type}/${id}`);
 
-  return (
+  return (loading ? <Loading /> : error ? <Error msg={error.message} /> :
     <div style={{'display': 'flex', 'justifyContent': 'center'}}>
       <LazyLoadList
-        loading={loading}
+        loading={false}
         data={recs}
         onClick={onProductClick}
       />

@@ -4,7 +4,7 @@ from dao.user.userDao import UserDao
 from apps.decorators import *
 from apps.err_messages import *
 from dao.token.tokenDao import TokenDao
-from security_utils.tokens import encode_token
+from security_utils.tokens import encode_token, decode_token
 from security_utils.passwd_encryption import check_passwd
 
 authenticate = Blueprint('authenticate', __name__)
@@ -49,3 +49,7 @@ def logout():
     HTTPStatus.INTERNAL_SERVER_ERROR
   )
   return {'status': 'success'}, HTTPStatus.OK
+
+@authenticate.route('/check-token', methods = ['GET'])
+@authorization_needed
+def check_token(): return {}, HTTPStatus.OK
