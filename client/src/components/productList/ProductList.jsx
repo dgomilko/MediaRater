@@ -1,6 +1,6 @@
 import React, { useEffect, useReducer, useRef, useCallback, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import Error from '../Error';
+import ErrorWrapper from '../ErrorWrapper';
 import Filters from './Filters';
 import LazyLoadList from '../LazyLoadList';
 import useProductsFetch from '../../hooks/useProductsFetch.js';
@@ -36,11 +36,7 @@ export default function ProductList({ type }) {
     setOutOfContent,
     error,
     setError
-  } = useProductsFetch(
-    `${process.env.REACT_APP_SERVER}/${type}`,
-    pageData,
-    options
-  );
+  } = useProductsFetch(type, pageData, options);
 
   const bottomObserverClb = node => {
     new IntersectionObserver(elements => elements.forEach(e => {
@@ -72,21 +68,23 @@ export default function ProductList({ type }) {
     productsDispatch({ type: 'FETCHING', payload: false });
   }, [items, outOfContent]);
 
-  return (error ? <Error msg={error.message} /> :
-    <div>
-      <div className={mainWrapper}>
-        <Filters
-          setOptions={setOptions}
-          options={options}
-          onClick={resetPage}
-        />
-        <LazyLoadList
-          loading={productsList.fetching}
-          data={productsList.data}
-          onClick={onProductClick}
-        />
+  return (
+    <ErrorWrapper error={error}>
+      <div>
+        <div className={mainWrapper}>
+          <Filters
+            setOptions={setOptions}
+            options={options}
+            onClick={resetPage}
+            />
+          <LazyLoadList
+            loading={productsList.fetching}
+            data={productsList.data}
+            onClick={onProductClick}
+          />
+        </div>
+        <div ref={bottomRef}></div>
       </div>
-      <div ref={bottomRef}></div>
-    </div>
+    </ErrorWrapper>
   );
 };

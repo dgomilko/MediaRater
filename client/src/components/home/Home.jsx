@@ -15,7 +15,7 @@ export default function Home() {
   const [loading, setLoading] = useState([...Array(types.length)]
     .map(() => true));
   const products = types.map(type => useProductsFetch(
-      `${process.env.REACT_APP_SERVER}/${type.toLowerCase()}`,
+      type.toLowerCase(),
       { page: 1 }
     ).items
   );

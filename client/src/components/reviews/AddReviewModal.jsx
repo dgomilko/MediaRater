@@ -1,9 +1,11 @@
 import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../../contexts/UserContext';
+import useStorage from '../../hooks/useStorage';
 import StarsRate from './StarsRate';
 import Modal from '../Modal';
-import Error from '../Error';
+import ErrorWrapper from '../ErrorWrapper';
+import { post } from '../../utils/request';
 import {
   modal,
   textbox,
@@ -19,6 +21,7 @@ export default function AddReviewModal({ closeFn, display, type, productId }) {
   const [text, setText] = useState('');
   const { userState, userDispatch } = useContext(UserContext);
   const navigate = useNavigate();
+  const { handleExpiration } = useStorage();
 
   const handleAddReview = async () => {
     if (!userState.id || !productId) return;
@@ -29,55 +32,44 @@ export default function AddReviewModal({ closeFn, display, type, productId }) {
       rate: rating,
       product_id: productId,
     };
-    const requestInfo = {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
+    const options = {
+      responseHandler: (response, json) => {
+        if (response.status >= 400) {
+          handleExpiration(json);
+        } else {
+          navigate(`/${type}/${json.product_id}`);
+          userDispatch({
+            type: 'SET_INFO',
+            payload: { id: json.user_id, expired: false }
+          });
+        }
       },
-      body: JSON.stringify(body),
+      errHandler: (e) => setError(e),
+      finallyHandler: () => closeFn(),
     };
-    const url = `${process.env.REACT_APP_SERVER}/product/new-${type}-review`;
-    try {
-      const response = await fetch(url, requestInfo);
-      const json = await response.json();
-      if (response.status >= 400) {
-        closeFn();
-        if (json.message === 'Signature expired')
-          userDispatch({type: 'SET_INFO', payload: { expired: true }});
-        const message = json.message || 'Unknown server error';
-        throw new Error(message);
-      } else {
-        navigate(`/${type}/${json.product_id}`);
-        userDispatch({
-          type: 'SET_INFO',
-          payload: { id: json.user_id, expired: false }
-        });
-        closeFn();
-      }
-    } catch (e) {
-      setError(e);
-    }
+    await post(`product/new-${type}-review`, body, options, token);
   };
 
-  return (error ? <Error msg={error.message} /> :
-    <Modal display={display} closeFn={closeFn} className={modal}>
-      <div className={rateWrapper}>
-        <span>Rate this content:</span>
-        <StarsRate rating={rating} setRating={setRating} />
-      </div>
-      <div className={blockWrapper}>
-        <div className={textWrapper}>
-          <span>Your review:</span>
-          <textarea class={textbox} onChange={(e) => setText(e.target.value)}/>
+  return (
+    <ErrorWrapper error={error}> 
+      <Modal display={display} closeFn={closeFn} className={modal}>
+        <div className={rateWrapper}>
+          <span>Rate this content:</span>
+          <StarsRate rating={rating} setRating={setRating} />
         </div>
-        <input
-          type='button'
-          className={addReview}
-          onClick={handleAddReview}
-          value='Add review'
-        />
-      </div>
-    </Modal>
+        <div className={blockWrapper}>
+          <div className={textWrapper}>
+            <span>Your review:</span>
+            <textarea class={textbox} onChange={(e) => setText(e.target.value)}/>
+          </div>
+          <input
+            type='button'
+            className={addReview}
+            onClick={handleAddReview}
+            value='Add review'
+            />
+        </div>
+      </Modal>
+    </ErrorWrapper>
   );
 };

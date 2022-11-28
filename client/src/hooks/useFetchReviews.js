@@ -1,49 +1,25 @@
-import {
-  useEffect,
-  useState,
-  useReducer,
-} from 'react';
+import { useEffect, useReducer } from 'react';
 import { useParams } from 'react-router-dom';
 import productsReducer from '../reducers/productsReduser';
 import pageReducer from '../reducers/pageReducer';
+import { post } from '../utils/request';
+import defaultOptions from './defaultOptions';
 
 export default function useFetchReviews(url, onReload = false) {
   const params = useParams();
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [data, setData] = useState({});
   const [reviewsData, reviewsDispatch] =
     useReducer(productsReducer, { data: [] });
   const [pageData, pageDispatch] =
     useReducer(pageReducer, { page: 1 });
+  const { options, data, error, setError, loading, setLoading } =
+    defaultOptions();
   const { id } = params;
   const deps = [pageData.page];
   if (onReload) deps.push(params);
 
   useEffect(() => {
-    const fetchData = async () => {
-      if (!id) return;
-      const requestInfo = {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id, page: pageData.page }),
-      };
-      try {
-        const response = await fetch(url, requestInfo);
-        const json = await response.json();
-        setLoading(false);
-        if (response.status >= 400) {
-          const message = json.message || 'Unknown server error';
-          throw new Error(message);
-        } else {
-          setData(json);
-        }
-      } catch (e) {
-        setError(e);
-      };
-    };
-
-    fetchData();
+    if (!id) return;
+    post(url, { id, page: pageData.page }, options);
   }, deps);
 
   useEffect(() => {

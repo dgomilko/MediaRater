@@ -21,9 +21,7 @@ export default function UserReviews({ type }) {
     data,
     loading,
     setLoading
-  } = useFetchReviews(
-    `${process.env.REACT_APP_SERVER}/user/${type}-reviews`, true
-  );
+  } = useFetchReviews(`user/${type}-reviews`, true);
 
   useEffect(() => {
     setError('');

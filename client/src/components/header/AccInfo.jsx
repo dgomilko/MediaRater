@@ -1,8 +1,10 @@
 import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../../contexts/UserContext';
+import useStorage from '../../hooks/useStorage';
+import { post } from '../../utils/request';
 import AccLogo from '../profile/AccLogo';
-import Error from '../Error';
+import ErrorWrapper from '../ErrorWrapper';
 import {
   accInfoWrapper,
   accLogo,
@@ -13,45 +15,41 @@ import {
 
 export default function AccInfo() {
   const [error, setError] = useState();
-  const { userState, userDispatch } = useContext(UserContext);
+  const { userState } = useContext(UserContext);
   const navigate = useNavigate();
+  const { clearData } = useStorage();
 
   const handleLogout = async () => {
     if (!userState.token) return;
     const { token } = userState;
-    const requestInfo = {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
+    const options = {
+      responseHandler: (response, json) => {
+        clearData();
+        if (response.status >= 400) {
+          const message = json.message || 'Unknown server error';
+          if (message !== 'Signature expired')
+            throw new Error(message);
+        }
       },
+      errHandler: (e) => setError(e)
     };
-    const url = `${process.env.REACT_APP_SERVER}/logout`;
-    try {
-      const response = await fetch(url, requestInfo);
-      const json = await response.json();
-      localStorage.clear();
-      userDispatch({type: 'CLEAR'});
-      if (response.status >= 400) {
-        const message = json.message || 'Unknown server error';
-        if (message !== 'Signature expired') throw new Error(message);
-      }
-    } catch (e) {
-      setError(e);
-    }
+
+    await post('logout', {}, options, token);
   };
 
   const onLogoClick = () => navigate(`/user/${userState.id}`);
 
-  return (error ? <Error msg={error.message} /> :
-    <div className={accInfoWrapper}>
-      <div className={logoNameWrapper} onClick={onLogoClick}>
-        <AccLogo name={userState?.name} className={accLogo} />
-        <span className={headerText}>{userState?.name}</span>
+  return (
+    <ErrorWrapper error={error}>
+      <div className={accInfoWrapper}>
+        <div className={logoNameWrapper} onClick={onLogoClick}>
+          <AccLogo name={userState?.name} className={accLogo} />
+          <span className={headerText}>{userState?.name}</span>
+        </div>
+        <p className={logoutText} onClick={handleLogout}>
+          Logout
+        </p>
       </div>
-      <p className={logoutText} onClick={handleLogout}>
-        Logout
-      </p>
-    </div>
+    </ErrorWrapper>
   );
 };

@@ -11,7 +11,7 @@ import ExpirationWrapper from './components/ExpirationWrapper';
 import Login from './components/auth/Login';
 import Profile from './components/profile/Profile';
 import Product from './components/product/Product';
-import Error from './components/Error';
+import ErrorWrapper from './components/ErrorWrapper';
 import './styles/styles.scss';
 
 export default function App() {
@@ -35,7 +35,9 @@ export default function App() {
           <BrowserRouter>
             <Header />
             <Routes>
-              <Route path='*' element={ <Error msg="Couldn't find this page" /> } />
+              <Route path='*' element={ <ErrorWrapper
+                error={{message: "Couldn't find this page"}}
+              /> } />
               {Object.entries(routes).map(([path, El]) => (
                 <Route path={path} element={wrapped(El)}/>
               ))}

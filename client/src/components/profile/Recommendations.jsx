@@ -1,15 +1,18 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { useLocation, useNavigate, Navigate } from 'react-router-dom';
-import Error from '../Error';
+import ErrorWrapper from '../ErrorWrapper';
 import Loading from '../Loading';
 import LazyLoadList from '../LazyLoadList';
+import { post, throwResError } from '../../utils/request';
+import useStorage from '../../hooks/useStorage';
 import { UserContext } from '../../contexts/UserContext';
 
 export default function Recommendations({ type }) {
-  const { userState, userDispatch } = useContext(UserContext);
+  const { userState } = useContext(UserContext);
   const location = useLocation();
   const id = location.pathname.split('/')[2];
   if (userState?.id !== id) return <Navigate to={`/user/${id}`} />;
+  const { handleExpiration } = useStorage();
   const [error, setError] = useState('');
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -17,41 +20,23 @@ export default function Recommendations({ type }) {
   const [taskId, setTaskId] = useState('');
 
   useEffect(() => {
-    const requestRecs = async () => {
-      const { token, id } = userState;
-      if (!id) return;
-      const requestInfo = {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({ id }),
-      };
-      const url = `${process.env.REACT_APP_SERVER}/recommend/rec-${type}s`;
-      try {
-        const response = await fetch(url, requestInfo);
-        const json = await response.json();
-        if (response.status >= 400) {
-          if (json.message === 'Signature expired')
-            userDispatch({type: 'SET_INFO', payload: { expired: true }});
-          const message = json.message || 'Unknown server error';
-          throw new Error(message);
-        } else {
+    if (!userState.id) return;
+    const options = {
+      responseHandler: (response, json) => {
+        response.status >= 400 ? handleExpiration(json) :
           setTaskId(json.task_id);
-        }
-      } catch (e) {
-        setError(e);
-      }
+      },
+      errHandler: (e) => setError(e)
     };
 
     setLoading(true);
-    requestRecs();
+    post(`recommend/rec-${type}s`, { id }, options, userState.token);
   }, [userState, location]);
 
   useEffect(() => {
+    if (!taskId) return;
+
     const getTaskRes = async () => {
-      if (!taskId) return;
       const { token } = userState;
       const requestInfo = {
         method: 'GET',
@@ -62,8 +47,7 @@ export default function Recommendations({ type }) {
         const response = await fetch(url, requestInfo);
         const json = await response.json();
         if (response.status >= 400) {
-          const msg = json.status || 'Internal server error';
-          throw new Error(msg);
+          throwResError(json)
         } else if (json.status === 'PENDING') {
           setTimeout(() => getTaskRes(taskId), 100); 
         } else {
@@ -81,13 +65,15 @@ export default function Recommendations({ type }) {
 
   const onProductClick = id => navigate(`/${type}/${id}`);
 
-  return (loading ? <Loading /> : error ? <Error msg={error.message} /> :
-    <div style={{'display': 'flex', 'justifyContent': 'center'}}>
-      <LazyLoadList
-        loading={false}
-        data={recs}
-        onClick={onProductClick}
-      />
-    </div>
+  return (loading ? <Loading /> :
+    <ErrorWrapper msg={error.message} >
+      <div style={{'display': 'flex', 'justifyContent': 'center'}}>
+        <LazyLoadList
+          loading={false}
+          data={recs}
+          onClick={onProductClick}
+          />
+      </div>
+    </ErrorWrapper>
   );
 };

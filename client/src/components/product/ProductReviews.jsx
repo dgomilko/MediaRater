@@ -15,7 +15,7 @@ export default function ProductReviews({ type }) {
   const navigate = useNavigate();
 
   const { pageDispatch, reviewsData, error, data, loading } = useFetchReviews(
-    `${process.env.REACT_APP_SERVER}/product/${type}-reviews`
+    `product/${type}-reviews`
   );
 
   const onUserClick = id => navigate(`/user/${id}`);

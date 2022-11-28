@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import Loading from '../Loading';
-import Error from '../Error';
+import ErrorWrapper from '../ErrorWrapper';
+import defaultOptions from '../../hooks/defaultOptions';
+import { post } from '../../utils/request';
 import { getAgeGaps, generateColor, getTopCountries } from './productStatsUtils';
 import Chart from './Chart';
 import {
@@ -10,39 +12,16 @@ import {
 } from '../../styles/components/product/ProductStats.module.scss'
 
 export default function ProductStats({ type }) {
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
   const params = useParams();
-  const [stats, setStats] = useState([]);
   const [options, setOptions] = useState({});
+  const { options: handleOptions, error, loading, data: stats  } =
+    defaultOptions();
   const [chartOption, setChartOption] = useState('Viewers by age');
   const { id } = params;
 
   useEffect(() => {
-    const fetchStats = async () => {
-      if (!id) return;
-      const requestInfo = {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id }),
-      };
-      const url = `${process.env.REACT_APP_SERVER}/product/${type}-stats`;
-      try {
-        const response = await fetch(url, requestInfo);
-        const json = await response.json();
-        setLoading(false);
-        if (response.status >= 400) {
-          const message = json.message || 'Unknown server error';
-          throw new Error(message);
-        } else {
-          setStats(json.stats);
-        }
-      } catch (e) {
-        setError(e);
-      }
-    };
-    
-    fetchStats();
+    if (!id) return;
+    post(`${type}-stats`, { id }, handleOptions);
   }, [id]);
   
   useEffect(() => {
@@ -135,7 +114,7 @@ export default function ProductStats({ type }) {
   }, [stats]);
   
   return (loading ? <div style={{'height': '150px'}}><Loading /></div> :
-    error ? <Error msg={error.message} /> :
+    <ErrorWrapper error={error}>
       <div className={statsWrapper}>
         <select
           className={optionsSelect}
@@ -151,5 +130,6 @@ export default function ProductStats({ type }) {
           chartOptions={options[chartOption]?.chartTypes}
         />
       </div>
+    </ErrorWrapper>
   );
 };

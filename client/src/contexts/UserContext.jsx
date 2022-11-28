@@ -1,4 +1,5 @@
 import React, { createContext, useEffect, useReducer } from 'react';
+import { get, throwResError } from '../utils/request';
 import userReducer from '../reducers/userReducer';
 
 export const UserContext = createContext(undefined);
@@ -7,31 +8,25 @@ export function UserProvider(props) {
   const [userState, userDispatch] = useReducer(userReducer, {});
   
   useEffect(() => {
+    
     const checkToken = async (localData) => {
-      const { token } = localData;
-      if (!token) return;
-      const requestInfo = {
-        method: 'GET',
-        headers: { 'Authorization': `Bearer ${token}` }
-      };
-      const url = `${process.env.REACT_APP_SERVER}/check-token`;
-      try {
-        const response = await fetch(url, requestInfo);
-        const json = await response.json();
-        if (response.status >= 400) {
-          const msg = json.status || 'Internal server error';
-          throw new Error(msg);
-        } else {
+      const options = {
+        responseHandler: (response, json) => {
+          (response.status >= 400) ? throwResError(json) :
+            userDispatch({
+              type: 'SET_INFO',
+              payload: { ...localData, expired: false }
+            });
+        },
+        errHandler: (e) => {
+          localStorage.clear();
           userDispatch(
-            {type: 'SET_INFO', payload: { ...localData, expired: false }}
+            {type: 'SET_INFO', payload: { expired: true }}
           );
         }
-      } catch (e) {
-        localStorage.clear();
-        userDispatch(
-          {type: 'SET_INFO', payload: { expired: true }}
-        );
       }
+      if (!localData.token) return;
+      await get('check-token', {}, options, localData.token);
     };
 
     const localData = localStorage.getItem(process.env.REACT_APP_STORAGE_KEY);
