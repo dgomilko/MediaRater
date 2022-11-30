@@ -7,6 +7,7 @@ import Loading from '../Loading';
 import ErrorWrapper from '../ErrorWrapper';
 import AccLogo from './AccLogo';
 import ProfileNavbar from './ProfileNavbar';
+import { types } from '../../utils/productTypes';
 import {
   accountWrapper,
   logo,
@@ -17,11 +18,7 @@ import {
 } from '../../styles/components/profile/Profile.module.scss';
 
 export default function Profile() {
-  const { data, error, loading } = useDescriptionFetch(
-    'my_id',
-    'user/profile'
-  );
-  const types = ['movie', 'book', 'show'];
+  const { data, error, loading } = useDescriptionFetch('my_id', 'user');
   
   return (loading ? <Loading /> :
     <ErrorWrapper error={error}>

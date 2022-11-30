@@ -1,10 +1,9 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import useLogoutHandler from '../../hooks/auth/useLogoutHandler';
 import { UserContext } from '../../contexts/UserContext';
-import useStorage from '../../hooks/useStorage';
-import { post } from '../../utils/request';
-import AccLogo from '../profile/AccLogo';
 import ErrorWrapper from '../ErrorWrapper';
+import AccLogo from '../profile/AccLogo';
 import {
   accInfoWrapper,
   accLogo,
@@ -14,29 +13,9 @@ import {
 } from '../../styles/components/header/AccInfo.module.scss';
 
 export default function AccInfo() {
-  const [error, setError] = useState();
   const { userState } = useContext(UserContext);
   const navigate = useNavigate();
-  const { clearData } = useStorage();
-
-  const handleLogout = async () => {
-    if (!userState.token) return;
-    const { token } = userState;
-    const options = {
-      responseHandler: (response, json) => {
-        clearData();
-        if (response.status >= 400) {
-          const message = json.message || 'Unknown server error';
-          if (message !== 'Signature expired')
-            throw new Error(message);
-        }
-      },
-      errHandler: (e) => setError(e)
-    };
-
-    await post('logout', {}, options, token);
-  };
-
+  const { error, handleLogout } = useLogoutHandler();
   const onLogoClick = () => navigate(`/user/${userState.id}`);
 
   return (

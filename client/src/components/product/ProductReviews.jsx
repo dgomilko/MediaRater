@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import useFetchReviews from '../../hooks/useFetchReviews';
+import useFetchReviews from '../../hooks/review/useFetchReviews';
 import ReviewsList from '../reviews/ReviewsList';
 import AccLogo from '../profile/AccLogo';
 import Loading from '../Loading';
@@ -14,9 +14,8 @@ import {
 export default function ProductReviews({ type }) {
   const navigate = useNavigate();
 
-  const { pageDispatch, reviewsData, error, data, loading } = useFetchReviews(
-    `product/${type}-reviews`
-  );
+  const { pageDispatch, reviewsData, error, data, loading } =
+    useFetchReviews(type);
 
   const onUserClick = id => navigate(`/user/${id}`);
 

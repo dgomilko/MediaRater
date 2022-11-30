@@ -1,12 +1,13 @@
 import React from 'react';
 import DropdownMenu from './DropdownMenu';
 import { useLocation } from 'react-router-dom';
+import { types } from '../../utils/productTypes';
 import {
   navbarWrapper,
 } from '../../styles/components/profile/ProfileNavbar.module.scss'
 
 export default function ProfileNavbar({ ownPage }) {
-  const products = ['Movies', 'Shows', 'Books'];
+  const products = types.map(t => `${t[0].toUpperCase() + t.slice(1)}s`);
   const location = useLocation();
   const path = location.pathname.split('/')[3];
   const selected = path?.split('-')[1];

@@ -1,13 +1,12 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext } from 'react';
 import { Navigate } from 'react-router-dom'
 import ErrorWrapper from '../ErrorWrapper';
+import Submitter from './Submitter';
 import InputField from './InputField';
 import { UserContext } from '../../contexts/UserContext';
-import useFormValidation from '../../hooks/useFormValidation';
-import { signUpVerifiers } from '../../verifiers/signUpVerifiers';
 import CountrySelector from './countrySelector/CountrySelector';
-import { post, throwResError } from '../../utils/request';
-import useStorage from '../../hooks/useStorage';
+import useRegisterHandler from '../../hooks/auth/useRegisterHandler';
+import { signUpVerifiers } from '../../verifiers/signUpVerifiers';
 import {
   areaWrapper,
   title,
@@ -19,40 +18,9 @@ import { warningWrapper } from '../../styles/components/auth/InputField.module.s
 export default function Register() {
   const { userState } = useContext(UserContext);
   if (userState?.id) return <Navigate to={`/user/${userState?.id}`} />;
-  const {
-    handleChange,
-    data,
-    errors,
-    setErrors
-  } = useFormValidation(signUpVerifiers);
-  const [error, setError] = useState('');
-  const { storeData } = useStorage();
+  const { handleChange, data, errors, error, handleSubmit } =
+    useRegisterHandler(signUpVerifiers);
 
-  const handleSubmit = async e => {
-    e.preventDefault();
-    const userData = {
-      ...data,
-      birthday: data.birthday.split('.').reverse().join('.') 
-    };
-    delete userData.passwordConf;
-
-    const options = {
-      responseHandler: (response, json) => {
-        (response.status >= 400) ?
-          (response.status === 403 && json.message) ?
-            setErrors({ email: json.message }) :
-            throwResError(json) :
-          storeData(json);
-      },
-      errHandler: (e) => setError(e)
-    }
-    await post('register', userData, options);
-  };
-  
-  const errorsFound = !!(Object.keys(errors).length);
-  const emptyFields = Object.keys(data).length !==
-    Object.keys(signUpVerifiers.validations).length;
-  const submitImpossible = errorsFound || emptyFields;
   return (
     <ErrorWrapper error={error}>
       <div className={areaWrapper}>
@@ -117,7 +85,11 @@ export default function Register() {
             onChange={handleChange('passwordConf')}
             warning={errors['passwordConf']}
           />
-          <input className={submitBtn} type='submit' value="Register" disabled={submitImpossible} />
+          <Submitter
+            className={submitBtn}
+            val='Login'
+            ctx={{ errors, data, verifiers: signUpVerifiers }}
+          />
         </form>
       </div>
     </ErrorWrapper>

@@ -12,6 +12,7 @@ import Login from './components/auth/Login';
 import Profile from './components/profile/Profile';
 import Product from './components/product/Product';
 import ErrorWrapper from './components/ErrorWrapper';
+import { types } from './utils/productTypes';
 import './styles/styles.scss';
 
 export default function App() {
@@ -41,14 +42,14 @@ export default function App() {
               {Object.entries(routes).map(([path, El]) => (
                 <Route path={path} element={wrapped(El)}/>
               ))}
-              {['movies', 'shows', 'books'].map(type => (
-                <Route path={`/${type}`} element={
+              {types.map(type => (
+                <Route path={`/${type}s`} element={
                   <ExpirationWrapper>
-                    <ProductList type={type} />
+                    <ProductList type={`${type}s`} />
                   </ExpirationWrapper> }
                 />
               ))}
-              {['movie', 'show', 'book'].map(type => (
+              {types.map(type => (
                 <Route path={`/${type}/:id/*`} element={
                   <ExpirationWrapper>
                     <Product type={type} />

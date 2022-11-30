@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { throwResError } from '../utils/request';
+import { statuses } from '../utils/statuses';
 
 export default function defaultOptions() {
   const [loading, setLoading] = useState(true);
@@ -8,7 +9,8 @@ export default function defaultOptions() {
 
   const options = {
     responseHandler: (response, json) =>
-      response.status >= 400 ? throwResError(json) : setData(json),
+      response.status >= statuses.BAD_REQUEST ?
+        throwResError(json) : setData(json),
     errHandler: (e) => setError(e),
     finallyHandler: () => setLoading(false)
   }

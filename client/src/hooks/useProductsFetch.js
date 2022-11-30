@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
-import { post, throwResError } from '../utils/request';
+import { throwResError } from '../utils/request';
+import { mainApi } from '../api/mainApi';
+import { statuses } from '../utils/statuses';
 
-export default function useProductsFetch(url, pageData, searchOptions = {}) {
+export default function useProductsFetch(type, pageData, searchOptions = {}) {
   const [error, setError] = useState('');
   const [items, setItems] = useState([]);
   const [outOfContent, setOutOfContent] = useState(false);
@@ -11,15 +13,15 @@ export default function useProductsFetch(url, pageData, searchOptions = {}) {
     const { page } = pageData;
     const options = {
       responseHandler: (response, json) => {
-        response.status >= 400 ?
-          response.status === 404 && json.message ?
+        response.status >= statuses.BAD_REQUEST ?
+          response.status === statuses.NOT_FOUND && json.message ?
             setOutOfContent(true) : throwResError(json) :
           setItems(json.products);
       },
       errHandler: (e) => setError(e)
     };
 
-    post(url, { page, ...searchOptions }, options);
+    mainApi[type]({ page, ...searchOptions }, options);
   }, [pageData.page]);
 
   return { items, setItems, outOfContent, setOutOfContent, error, setError };

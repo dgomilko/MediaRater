@@ -1,6 +1,7 @@
 import { useContext } from 'react';
 import { UserContext } from '../contexts/UserContext';
 import { throwResError } from '../utils/request';
+import { messages } from '../utils/statuses';
 
 export default function useStorage() {
   const { userDispatch } = useContext(UserContext);
@@ -24,7 +25,7 @@ export default function useStorage() {
   };
 
   const handleExpiration = (data) => {
-    if (data.message === 'Signature expired')
+    if (data.message === messages.EXPIRED)
       userDispatch({type: 'SET_INFO', payload: { expired: true }});
     throwResError(data);
   }

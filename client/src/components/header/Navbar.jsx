@@ -1,11 +1,13 @@
 import React from 'react';
 import NavbarLink from './NavbarLink';
+import { types } from '../../utils/productTypes';
 
 export default function Navbar() {
-  const productTypes = ['movies', 'shows', 'books'];
   return (
     <div>
-      {productTypes.map(p => <NavbarLink page={p} />)}
+      {types.map(p =>
+        <NavbarLink page={`${p[0].toUpperCase() + p.slice(1)}s`} />
+      )}
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import useFetchReviews from '../../hooks/useFetchReviews';
+import useFetchReviews from '../../hooks/review/useFetchReviews';
 import ReviewsList from '../reviews/ReviewsList';
 import Loading from '../Loading';
 import {
@@ -21,7 +21,7 @@ export default function UserReviews({ type }) {
     data,
     loading,
     setLoading
-  } = useFetchReviews(`user/${type}-reviews`, true);
+  } = useFetchReviews(`user${type}`, true);
 
   useEffect(() => {
     setError('');

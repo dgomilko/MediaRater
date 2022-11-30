@@ -1,11 +1,11 @@
 import { useEffect, useReducer } from 'react';
 import { useParams } from 'react-router-dom';
-import productsReducer from '../reducers/productsReduser';
-import pageReducer from '../reducers/pageReducer';
-import { post } from '../utils/request';
-import defaultOptions from './defaultOptions';
+import productsReducer from '../../reducers/productsReduser';
+import pageReducer from '../../reducers/pageReducer';
+import defaultOptions from '../defaultOptions';
+import { mainApi } from '../../api/mainApi';
 
-export default function useFetchReviews(url, onReload = false) {
+export default function useFetchReviews(type, onReload = false) {
   const params = useParams();
   const [reviewsData, reviewsDispatch] =
     useReducer(productsReducer, { data: [] });
@@ -19,7 +19,7 @@ export default function useFetchReviews(url, onReload = false) {
 
   useEffect(() => {
     if (!id) return;
-    post(url, { id, page: pageData.page }, options);
+    mainApi[`${type}Reviews`]({ id, page: pageData.page }, options);
   }, deps);
 
   useEffect(() => {

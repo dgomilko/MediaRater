@@ -24,10 +24,7 @@ import {
 export default function Product({ type }) {
   const { userState } = useContext(UserContext);
   const [modal, setModal] = useState(false);
-  const { data, error, loading } = useDescriptionFetch(
-    'user_id',
-    `product/${type}-desc`
-  );
+  const { data, error, loading } = useDescriptionFetch('user_id', type);
   const productLength = {
     'movie': data?.runtime,
     'show': `${data?.seasons} s (${data?.episodes} ep)`,

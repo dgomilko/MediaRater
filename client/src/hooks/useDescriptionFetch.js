@@ -2,9 +2,9 @@ import { useContext, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { UserContext } from '../contexts/UserContext';
 import defaultOptions from './defaultOptions';
-import { post } from '../utils/request';
+import { mainApi } from '../api/mainApi';
 
-export default function useDescriptionFetch(userParam, route) {
+export default function useDescriptionFetch(userParam, type) {
   const { userState } = useContext(UserContext);
   const { id } = useParams();
   const { id: user_id } = userState;
@@ -12,8 +12,8 @@ export default function useDescriptionFetch(userParam, route) {
 
   useEffect(() => {
     if (!id || user_id === undefined) return;
-    post(route, { [userParam]: user_id, id }, options);
-  }, [userState]);
+    mainApi[`${type}Desc`]({ [userParam]: user_id, id }, options);
+  }, [userState, id]);
 
   return { data, error, loading };
 };

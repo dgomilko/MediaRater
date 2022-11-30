@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Loading from '../Loading';
 import Scrollable from './Scrollable';
 import useProductsFetch from '../../hooks/useProductsFetch';
+import { types } from '../../utils/productTypes';
 import {
   productWrapper,
   listsWrapper,
@@ -11,13 +12,10 @@ import {
 } from '../../styles/components/home/Home.module.scss';
 
 export default function Home() {
-  const types = ['Movies', 'Shows', 'Books'];
   const [loading, setLoading] = useState([...Array(types.length)]
     .map(() => true));
-  const products = types.map(type => useProductsFetch(
-      type.toLowerCase(),
-      { page: 1 }
-    ).items
+  const products = types.map(type =>
+    useProductsFetch(`${type}s`, { page: 1 }).items
   );
 
   useEffect(() => {
