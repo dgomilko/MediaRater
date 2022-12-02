@@ -21,6 +21,7 @@ const routes = {
       [`${t}Stats`]: `product/${t}-stats`,
       [`${t}ReviewAdd`]: `product/new-${t}-review`,
       [`${t}s`]: `${t}s`,
+      [`${t}Genres`]: `${t}-genres`,
     }), {}),
 };
 

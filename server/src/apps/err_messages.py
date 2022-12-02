@@ -18,3 +18,4 @@ class ErrMsg(str, Enum):
   LOGOUT_ERROR: str = 'Error while logging out'
   NO_RECS: str = 'Not enough reviews to make recommendations'
   REVIEWED: str = 'You have already reviewed this product'
+  INTERNAL: str = 'Internal server error'

@@ -1,5 +1,5 @@
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy import desc, asc, nullslast, nullsfirst
+from sqlalchemy import and_, desc, asc, nullslast, nullsfirst
 from sqlalchemy.sql import func
 from dao.dao import Dao
 import numpy as np
@@ -7,7 +7,7 @@ from extensions import db
 from db.models import *
 from dao.model_mappers import *
 from dao.reviews_loader import limit_per_page
-from db.models import MediaProduct
+from db.models import MediaProduct, Genre, product_genres
 
 class ProductDao(Dao):
   @staticmethod
@@ -49,6 +49,13 @@ class ProductDao(Dao):
     common['rating'] = rating
     common['reviews'] = len(result.reviews.all())
     return (result, common)
+
+  @staticmethod
+  def get_all_genres(model: db.Model) -> list[str]:
+    result = db.session.query(Genre) \
+      .join(product_genres).join(MediaProduct) \
+      .join(model).distinct().all()
+    return [r.name for r in result]
   
   @staticmethod
   @limit_per_page(10)
@@ -70,17 +77,26 @@ class ProductDao(Dao):
     model: db.Model,
     review_model: db.Model,
     order: str ='desc',
-    filter: str = 'popular'
+    filter: str = 'popular',
+    min_rate: int = 0,
+    max_rate: int = 5,
+    genres: list[str] = []
   ) -> list[dict]:
     results_per_page = 20
     offset = results_per_page * (page - 1)
     limit = results_per_page * page
     order_fn = globals()[order]
-    null_order = nullsfirst if order == 'asc' else nullslast;
+    null_order = nullsfirst if order == 'asc' else nullslast
+    rate_filter = and_(
+      min_rate <= func.avg(review_model.rate),
+      func.avg(review_model.rate) <= max_rate
+    )
+    def title_sort(query):
+      if not genres: query.outerjoin(MediaProduct)
+      return query.group_by(model.id, MediaProduct.title) \
+        .order_by(order_fn(MediaProduct.title))
     filters = {
-      'title': lambda query: query.outerjoin(MediaProduct)
-        .group_by(model.id, MediaProduct.title)
-        .order_by(order_fn(MediaProduct.title)),
+      'title': title_sort,
       'rating': lambda query: query.group_by(model.id)
         .order_by(null_order(order_fn('rating'))),
       'popular': lambda query: query.group_by(model.id)
@@ -90,8 +106,10 @@ class ProductDao(Dao):
         model,
         func.avg(review_model.rate).label('rating'),
       ).outerjoin(review_model)
-    result = filters[filter](query) \
-      .distinct() \
+    if genres: query = query.join(MediaProduct) \
+      .filter(MediaProduct.genres.any(Genre.name.in_(genres)))
+    result = filters[filter](query).distinct() \
+      .having(rate_filter) \
       .slice(offset, limit) \
       .all()
     if not result: return None

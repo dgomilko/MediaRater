@@ -24,16 +24,15 @@ def product_dao_factory(
   def get_ids() -> list[dict]:
     return [x[0] for x in ProductDao.get_all_ids(model)]
 
-  def load(
-    page: int,
-    order: str ='desc',
-    filter: str = 'popular'
-  ) -> list[dict]:
+  def load(page: int, **kwargs) -> list[dict]:
     return ProductDao \
-      .load_products(page, model, review_model, order, filter)
+      .load_products(page, model, review_model, **kwargs)
 
   def stats(pid: str) -> list[dict]:
     return ProductDao.get_stats(pid, model)
+
+  def genres() -> list[str]:
+    return ProductDao.get_all_genres(model)
 
   methods = {
     'add_new': staticmethod(add_new),
@@ -42,5 +41,6 @@ def product_dao_factory(
     'get_ids': staticmethod(get_ids),
     'load': staticmethod(load),
     'stats': staticmethod(stats),
+    'genres': staticmethod(genres),
   }
   return type(name, (ProductDao,), methods)
