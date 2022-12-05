@@ -80,7 +80,9 @@ class ProductDao(Dao):
     filter: str = 'popular',
     min_rate: int = 0,
     max_rate: int = 5,
-    genres: list[str] = []
+    genres: list[str] = [],
+    max_year: str = '',
+    min_year: str = ''
   ) -> list[dict]:
     results_per_page = 20
     offset = results_per_page * (page - 1)
@@ -91,24 +93,31 @@ class ProductDao(Dao):
       min_rate <= func.avg(review_model.rate),
       func.avg(review_model.rate) <= max_rate
     )
-    def title_sort(query):
-      if not genres: query.outerjoin(MediaProduct)
-      return query.group_by(model.id, MediaProduct.title) \
-        .order_by(order_fn(MediaProduct.title))
-    filters = {
-      'title': title_sort,
-      'rating': lambda query: query.group_by(model.id)
-        .order_by(null_order(order_fn('rating'))),
-      'popular': lambda query: query.group_by(model.id)
-        .order_by(null_order(order_fn(func.count(review_model.rate)))),
+    year_filter_needed = max_year or min_year
+    sorting = {
+      'title': order_fn(MediaProduct.title),
+      'rating': null_order(order_fn('rating')),
+      'popular': null_order(order_fn(func.count(review_model.rate))),
     }
     query = db.session.query(
         model,
         func.avg(review_model.rate).label('rating'),
-      ).outerjoin(review_model)
-    if genres: query = query.join(MediaProduct) \
+      ).outerjoin(review_model) \
+      .join(MediaProduct)
+    if year_filter_needed:
+      year_filter = and_(
+        MediaProduct.release >= min_year,
+        MediaProduct.release <= max_year) \
+      if max_year and min_year else \
+        MediaProduct.release <= max_year if max_year \
+        else MediaProduct.release > min_year
+      query = query.filter(year_filter)
+    if genres: query = query \
       .filter(MediaProduct.genres.any(Genre.name.in_(genres)))
-    result = filters[filter](query).distinct() \
+
+    result = query.group_by(model.id, MediaProduct.title) \
+      .order_by(sorting[filter]) \
+      .distinct() \
       .having(rate_filter) \
       .slice(offset, limit) \
       .all()

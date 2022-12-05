@@ -7,14 +7,15 @@ import {
   reviewText,
   reviewTextWrapper,
   expand,
-  reviewHeader
+  reviewHeader,
+  date
 } from '../../styles/components/reviews/CollapsibleReview.module.scss';
 
 export default function CollapsibleReview({ header, product }) {
   const ref = useRef();
   const [expandBtn, setExpandBtn] = useState(false);
   const [expanded, setExpanded] = useState(false);
-  const clampedHeight = 150;
+  const clampedHeight = 130;
 
   useEffect(() => {
     if (ref.current.scrollHeight > clampedHeight) {
@@ -35,7 +36,10 @@ export default function CollapsibleReview({ header, product }) {
       ref={ref}
     >
       <div className={reviewAuthorWrapper}>
-        <Rating className={rating} rating={product.rate} />
+        <div>
+          <Rating className={rating} rating={product.rate} />
+          <span className={date}>{product.created}</span>
+        </div>
         <div className={textContentWrapper}>
           <div className={reviewHeader}>
             {header}

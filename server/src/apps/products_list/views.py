@@ -22,8 +22,9 @@ def load(dao: ProductDao):
     k: data[k] for k, v in options.items()
       if k in data.keys() and data[k] in v
   }
-  if 'genres' in data.keys():
-    kwargs['genres'] = data['genres']
+  params = ['genres', 'max_year', 'min_year']
+  for param in params:
+    if param in data.keys(): kwargs[param] = data[param]
   res = dao.load(page, **kwargs)
   valid = {'products': res}, HTTPStatus.OK
   return valid if res else err_response(

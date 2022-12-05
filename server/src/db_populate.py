@@ -7,10 +7,10 @@ from dao.review.review_daos import *
 from dao.review.ReviewDao import ReviewDao
 from db.models import *
 
-LIMIT = 100
+LIMIT = 500
+SHOWS_PATH = './media_data/shows.csv'
 MOVIES_PATH = './media_data/movies.csv'
 BOOKS_PATH = './media_data/books.csv'
-SHOWS_PATH = './media_data/shows.csv'
 
 users = [
   {
@@ -96,7 +96,7 @@ def populate_reviews(
 ):
   for user in users:
     db_user = User.query.filter_by(name=user['name']).first()
-    reiewed_products = sample(products, randint(0, 50))
+    reiewed_products = sample(products, randint(0, 250))
     for product in reiewed_products:
       db_product = product_model.query.join(MediaProduct) \
         .filter_by(title=product['title']).first()

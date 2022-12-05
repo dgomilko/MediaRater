@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { useLocation, useNavigate, Navigate } from 'react-router-dom';
+import { useLocation, Navigate } from 'react-router-dom';
 import Loading from '../Loading';
 import ErrorWrapper from '../ErrorWrapper';
 import LazyLoadList from '../LazyLoadList';
@@ -11,14 +11,13 @@ export default function Recommendations({ type }) {
   const location = useLocation();
   const id = location.pathname.split('/')[2];
   if (userState?.id !== id) return <Navigate to={`/user/${id}`} />;
-  const navigate = useNavigate();
   const { error, loading, recs } = useFetchRecs(type);
 
-  const onProductClick = id => navigate(`/${type}/${id}`);
+  const onProductClick = id => window.open(`/${type}/${id}`, '_blank');
 
   return (loading ? <Loading /> :
-    <ErrorWrapper msg={error.message} >
-      <div style={{'display': 'flex', 'justifyContent': 'center'}}>
+    <ErrorWrapper error={error} >
+      <div style={{ 'display': 'flex', 'justifyContent': 'center' }}>
         <LazyLoadList
           loading={false}
           data={recs}

@@ -22,7 +22,10 @@ export default function useFetchRecs(type) {
         response.status >= statuses.BAD_REQUEST ?
           handleExpiration(json) : setTaskId(json.task_id);
       },
-      errHandler: (e) => setError(e)
+      errHandler: (e) => {
+        setError(e)
+        setLoading(false)
+      }
     };
 
     const body = { id: userState.id };

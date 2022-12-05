@@ -32,6 +32,7 @@ class Config():
 	CELERY_RESULT_BACKEND = load_env('REDIS_URL')
 	TOKEN_EXP_MINS = load_env('TOKEN_EXP_MINS')
 	SERVER_NAME = f'{load_env("HOST")}:{load_env("PORT")}'
+	CACHE_MEMCACHED_SERVERS = 'localhost:11211'
 
 class DevelopmentConfig(Config):
 	ENV = 'development'

@@ -1,7 +1,7 @@
 import numpy as np
-import lightfm as lf
+from apps.recommend.model import model
 from scipy.sparse import coo_matrix
-from extensions import celery
+from extensions import celery, cache
 from dao.review.review_daos import *
 from dao.product.product_daos import *
 from dao.product.ProductDao import ProductDao
@@ -24,14 +24,18 @@ def get_recommendations(
   uids = UserDao.get_ids()
   lookup_uid, _ = np.unique(uids, return_inverse=True)
   lookup_pid, _ = np.unique(pids, return_inverse=True)
-  matrix = create_matrix(
-    (lookup_uid, lookup_pid),
-    (len(uids), len(pids)),
-    np.array(reviews)
-  )
-  sparse_mat = coo_matrix(matrix)
-  model = lf.LightFM(loss='warp')
-  model.fit(sparse_mat, epochs=30, num_threads=8)
+  key = f'matrix_{dao_type}'
+  matrices = cache.get(key)
+  if matrices is None:
+    matrix = create_matrix(
+      (lookup_uid, lookup_pid),
+      (len(uids), len(pids)),
+      np.array(reviews)
+    )
+    sparse_mat = coo_matrix(matrix)
+    cache.set(key, [sparse_mat, matrix])
+    model.fit(sparse_mat, epochs=30, num_threads=8)
+  else: sparse_mat, matrix = matrices
   mapped_uid = np.where(lookup_uid == user_id)[0][0]
   unrated = np.where(matrix[mapped_uid] == 0)[0]
   predicted = model.predict(user_ids=int(mapped_uid), item_ids=unrated)

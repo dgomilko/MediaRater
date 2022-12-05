@@ -1,10 +1,11 @@
 @use '../utils' as u;
+@use '../../variables' as v;
 
 .mainWrapper {
+  @include u.flex(column, $align: center);
   margin: 0;
   padding: 0;
   margin-top: 4%;
-  @include u.flex(column, $align: center);
 }
 
 .filterWrapper {
@@ -57,4 +58,30 @@
   @extend .submitBtn;
   width: 90px;
   margin-top: 2%;
+}
+
+.yearFilter {
+  @include u.flex(row, $justify: space-between);
+
+  input {
+    text-align: center;
+    width: 100px;
+    margin-top: 2%;
+    padding: 1%;
+    border-radius: 7px;
+  }
+
+  input:focus {
+    border: 2px solid v.$theme-blue;
+  }
+}
+
+.range {
+  span {
+    color: v.$theme-blue;
+  }
+}
+
+.genre {
+  border-radius: 10px;
 }

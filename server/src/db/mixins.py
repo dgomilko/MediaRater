@@ -1,4 +1,5 @@
 from sqlalchemy.orm import declared_attr
+from sqlalchemy.sql import func
 from security_utils.id_gen import generate_key
 from extensions import db
 
@@ -40,6 +41,10 @@ class ProductMixin(StrIdMixin, object):
 class ReviewMixin(IntIdMixin, object):
   text = db.Column(db.Text, nullable=True)
   rate = db.Column(db.Integer, nullable=False)
+  created = db.Column(
+    db.DateTime(timezone=True),
+    default=func.now()
+  )
 
   @declared_attr
   def user_id(cls):

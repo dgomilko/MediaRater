@@ -1,5 +1,7 @@
-from datetime import date
+from datetime import date, datetime
 from extensions import db
+
+date_frmt = lambda data: datetime.strftime(data.created, '%d.%m.%Y')
 
 def stats_mapper(reviews: list[db.Model]) -> list[dict]:
   today = date.today()
@@ -10,6 +12,7 @@ def stats_mapper(reviews: list[db.Model]) -> list[dict]:
     'country': r.user.country,
     'gender': r.user.gender,
     'age': get_age(r.user.birthday),
+    'created': date_frmt(r),
   } for r in reviews]
 
 review_mapper = lambda r: {
@@ -19,7 +22,8 @@ review_mapper = lambda r: {
   'author': r.user.name,
   'author_id': r.user_id,
   'product': r.product.product.title,
-  'product_id': r.product_id
+  'product_id': r.product_id,
+  'created': date_frmt(r),
 }
 
 product_short_mapper = lambda p: {

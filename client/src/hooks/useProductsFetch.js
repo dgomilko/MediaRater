@@ -13,10 +13,12 @@ export default function useProductsFetch(type, pageData, searchOptions = {}) {
     const { page } = pageData;
     const options = {
       responseHandler: (response, json) => {
-        response.status >= statuses.BAD_REQUEST ?
-          response.status === statuses.NOT_FOUND && json.message ?
-            setOutOfContent(true) : throwResError(json) :
-          setItems(json.products);
+        if (response.status >= statuses.BAD_REQUEST) {
+          if (response.status === statuses.NOT_FOUND && json.message)
+            setOutOfContent(true);
+          throwResError(json);
+        }
+        else setItems(json.products);
       },
       errHandler: (e) => setError(e)
     };

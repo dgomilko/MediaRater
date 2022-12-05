@@ -1,5 +1,5 @@
 import React, { useEffect, useReducer, useRef, useCallback, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import ErrorWrapper from '../ErrorWrapper';
 import Filters from './Filters';
 import LazyLoadList from '../LazyLoadList';
@@ -19,13 +19,13 @@ export default function ProductList({ type }) {
   );
   let bottomRef = useRef(null);
   const location = useLocation();
-  const navigate = useNavigate();
 
   const resetPage = () => {
     pageDispatch({ type: 'CLEAR', payload: 0 });
     productsDispatch({ type: 'CLEAR' });
+    setOutOfContent(false);
     setError('');
-  }
+  };
 
   useEffect(resetPage, [location]);
 
@@ -49,7 +49,7 @@ export default function ProductList({ type }) {
   const bottomObserver = useCallback(bottomObserverClb, [pageDispatch]);
 
   const onProductClick = id =>
-    navigate(`/${type.slice(0, type.length - 1)}/${id}`);
+    window.open(`/${type.slice(0, type.length - 1)}/${id}`, '_blank');
 
   useEffect(() => {
     if (bottomRef.current) bottomObserver(bottomRef.current);
@@ -62,29 +62,31 @@ export default function ProductList({ type }) {
   }, [location]);
 
   useEffect(() => {
-    if (outOfContent || !items.length) return;
+    if (outOfContent || !items.length) {
+      productsDispatch({ type: 'FETCHING', payload: false });
+      return;
+    };
     productsDispatch({ type: 'FETCHING', payload: true });
     productsDispatch({ type: 'LOAD', payload: items });
     productsDispatch({ type: 'FETCHING', payload: false });
   }, [items, outOfContent]);
 
   return (
-    <ErrorWrapper error={error}>
-      <div>
-        <div className={mainWrapper}>
-          <Filters
-            setOptions={setOptions}
-            options={options}
-            onClick={resetPage}
-            />
+    <div>
+      <div className={mainWrapper}>
+        <Filters
+          setOptions={setOptions}
+          options={options}
+          onClick={resetPage}
+        />
           <LazyLoadList
             loading={productsList.fetching}
             data={productsList.data}
             onClick={onProductClick}
           />
+        {!outOfContent && <ErrorWrapper error={error} style={{'width': '80%'}} />}
         </div>
         <div ref={bottomRef}></div>
       </div>
-    </ErrorWrapper>
   );
 };
