@@ -1,14 +1,13 @@
 from flask import Flask
 from flask_cors import CORS
-from init_db import init_db, conf_db_populate
-from apps.user.views import user
 from extensions import cache
-# from flask_caching import Cache
-from apps.product.views import product
-from apps.recommend.views import recommend
-from apps.authenticate.views import authenticate
+from apps.user.routes import user
+from apps.product.routes import product
+from apps.recommend.routes import recommend
+from init_db import init_db, conf_db_populate
+from apps.authenticate.routes import authenticate
 from apps.err_handler import register_err_handler
-from apps.products_list.views import products_list
+from apps.products_list.routes import products_list
 
 def create_app(populate=False) -> Flask:
   apps = [authenticate, user, product, recommend, products_list]

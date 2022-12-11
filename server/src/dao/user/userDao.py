@@ -36,6 +36,12 @@ class UserDao(Dao):
     return getattr(result, f'{attr}_reviews') if result else None
 
   @staticmethod
+  def count_reviews(uid: str, attr: str) -> int:
+    result = super(UserDao, UserDao).get_by_id(User, uid)
+    return len(list(getattr(result, f'{attr}_reviews'))) if result \
+      else 0
+
+  @staticmethod
   def get_ids() -> list[str]:
     return [x[0] for x in User.query.with_entities(User.id).all()]
     

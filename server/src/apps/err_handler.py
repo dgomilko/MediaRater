@@ -1,6 +1,6 @@
 from http import HTTPStatus
 from werkzeug.exceptions import HTTPException
-from apps.err_messages import err_response, ErrMsg
+from constants.err_messages import err_response, ErrMsg
 
 def register_err_handler(app):
 

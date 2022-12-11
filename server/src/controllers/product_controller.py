@@ -1,15 +1,15 @@
+import re
 from http import HTTPStatus
-from flask import request, Blueprint
-from dao.product.product_daos import *
-from dao.product.ProductDao import ProductDao
-from dao.review.ReviewDao import ReviewDao 
-from dao.review.review_daos import *
-from apps.routes_writer import register_routes
-from apps.err_messages import *
-from apps.decorators import authorization_needed, expected_fields
+from flask import request
+from extensions import celery
 from dao.user.userDao import UserDao
-
-product = Blueprint('product', __name__)
+from dao.review.ReviewDao import ReviewDao 
+from dao.product.ProductDao import ProductDao
+from dao.review.review_daos import *
+from constants.err_messages import *
+from dao.product.product_daos import *
+from recommender.recommender_task import update_model
+from controllers.decorators import authorization_needed, expected_fields
 
 @expected_fields(['id', 'user_id'])
 def description(
@@ -52,6 +52,7 @@ def add_review(review_dao: ReviewDao, product_dao: ProductDao):
   uid = data['user_id']
   pid = data['product_id']
   user_exists = UserDao.get_by_id(uid)
+  min_reviews = 5
   if not user_exists:
     return err_response(ErrMsg.NO_USER, HTTPStatus.NOT_FOUND)
   product_exists = product_dao.get_by_id(pid)
@@ -61,27 +62,45 @@ def add_review(review_dao: ReviewDao, product_dao: ProductDao):
   if already_reviewed:
     return err_response(ErrMsg.REVIEWED, HTTPStatus.FORBIDDEN)
   added = review_dao.add_new(data)
+  name_str = re.findall(
+    '[A-Z][^A-Z]*', product_dao.__name__
+  )[0].lower()
+  reviews_count = UserDao.count_reviews(uid, name_str)
+  if reviews_count == min_reviews:
+    update_model.apply_async(args=[name_str])
   return (added, HTTPStatus.CREATED) if added else err_response(
     ErrMsg.INVALID,
     HTTPStatus.BAD_REQUEST
   )
 
-routes_fns = {
-  '/product/movie-desc': lambda: description(MovieReviewDao, MovieDao),
-  '/product/book-desc': lambda: description(BookReviewDao, BookDao),
-  '/product/show-desc': lambda: description(ShowReviewDao, ShowDao),
+@expected_fields(['page'])
+def load(dao: ProductDao):
+  data = request.get_json()
+  page = data['page']
+  options = {
+    'order': ['asc', 'desc'],
+    'filter': ['title', 'rating', 'popular'],
+    'min_rate': list(range(0, 6)),
+    'max_rate': list(range(0, 6)),
+  }
+  kwargs = {
+    k: data[k] for k, v in options.items()
+      if k in data.keys() and data[k] in v
+  }
+  params = ['genres', 'max_year', 'min_year']
+  for param in params:
+    if param in data.keys(): kwargs[param] = data[param]
+  res = dao.load(page, **kwargs)
+  valid = {'products': res}, HTTPStatus.OK
+  return valid if res else err_response(
+    ErrMsg.NO_PAGE,
+    HTTPStatus.NOT_FOUND
+  )
 
-  '/product/movie-reviews': lambda: reviews(MovieDao),
-  '/product/book-reviews': lambda: reviews(BookDao),
-  '/product/show-reviews': lambda: reviews(ShowDao),
-
-  '/product/movie-stats': lambda: get_stats(MovieDao),
-  '/product/book-stats': lambda: get_stats(BookDao),
-  '/product/show-stats': lambda: get_stats(ShowDao),
-
-  '/product/new-movie-review': lambda: add_review(MovieReviewDao, MovieDao),
-  '/product/new-book-review': lambda: add_review(BookReviewDao, BookDao),
-  '/product/new-show-review': lambda: add_review(ShowReviewDao, ShowDao),
-}
-
-register_routes(product, routes_fns)
+def genres(dao: ProductDao):
+  res = dao.genres()
+  valid = {'genres': res}, HTTPStatus.OK
+  return valid if res else err_response(
+    ErrMsg.NO_CONTENT,
+    HTTPStatus.NOT_FOUND
+  )

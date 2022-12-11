@@ -4,7 +4,7 @@ from http import HTTPStatus
 from dao.user.userDao import UserDao
 from dao.token.tokenDao import TokenDao
 from security_utils.tokens import decode_token
-from apps.err_messages import err_response, ErrMsg
+from constants.err_messages import err_response, ErrMsg
 
 def date_formater(func: callable) -> callable:
   @functools.wraps(func)

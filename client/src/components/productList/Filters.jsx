@@ -51,6 +51,11 @@ export default function Filters({ setOptions, options, onClick }) {
     }
   ];
 
+  const yearFilters = {
+    from: 'min_year',
+    to: 'max_year',
+  };
+
   if (!Object.keys(options).length) {
     const initial = sortOptions.reduce((obj, x) => (
       { ...obj, [x.field]: x.options[Object.keys(x.options)[0]] }
@@ -67,7 +72,6 @@ export default function Filters({ setOptions, options, onClick }) {
   );
 
   const onSearchClick = () => {
-    console.log(options);
     setPrevOptions({ ...options });
     onClick();
   };
@@ -112,22 +116,17 @@ export default function Filters({ setOptions, options, onClick }) {
         </div>
         <div className={filterAndLabel}>
           <span>Release year</span>
-          <div>
-            <div className={yearFilter}>
-              <span>from</span>
-              <input
-                type='number'
-                onChange={(e) => setOptions({ ...options, min_year: e.target.value })}
-              />
+            {Object.entries(yearFilters).map(([label, field]) => (
+              <div className={yearFilter}>
+                <span>{label}</span>
+                <input
+                  type='number'
+                  value={options[field]}
+                  onChange={(e) => setOptions(
+                    { ...options, [field]: e.target.value })}
+                />
             </div>
-            <div className={yearFilter}>
-              <span>to</span>
-              <input
-                type='number'
-                onChange={(e) => setOptions({ ...options, max_year: e.target.value })}
-              />
-            </div>
-        </div>
+          ))}
         </div>
         {!(error || loading) &&
         <div className={filterAndLabel}>

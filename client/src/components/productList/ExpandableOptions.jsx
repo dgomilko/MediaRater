@@ -3,7 +3,7 @@ import {
   filterWrapper,
   header,
   filters,
-} from '../../styles/components/productsList/Filters.module.scss';
+} from '../../styles/components/productsList/ExpandableOptions.module.scss';
 
 export default function ExpandableOptions({ children, title }) {
   const [expanded, setExpanded] = useState(false);

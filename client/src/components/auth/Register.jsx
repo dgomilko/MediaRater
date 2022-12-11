@@ -87,7 +87,7 @@ export default function Register() {
           />
           <Submitter
             className={submitBtn}
-            val='Login'
+            val='Register'
             ctx={{ errors, data, verifiers: signUpVerifiers }}
           />
         </form>

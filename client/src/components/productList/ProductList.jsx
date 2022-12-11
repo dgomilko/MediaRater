@@ -63,7 +63,8 @@ export default function ProductList({ type }) {
 
   useEffect(() => {
     if (outOfContent || !items.length) {
-      productsDispatch({ type: 'FETCHING', payload: false });
+      if (outOfContent)
+        productsDispatch({ type: 'FETCHING', payload: false });
       return;
     };
     productsDispatch({ type: 'FETCHING', payload: true });
@@ -79,11 +80,11 @@ export default function ProductList({ type }) {
           options={options}
           onClick={resetPage}
         />
-          <LazyLoadList
-            loading={productsList.fetching}
-            data={productsList.data}
-            onClick={onProductClick}
-          />
+        <LazyLoadList
+          loading={productsList.fetching}
+          data={productsList.data}
+          onClick={onProductClick}
+        />
         {!outOfContent && <ErrorWrapper error={error} style={{'width': '80%'}} />}
         </div>
         <div ref={bottomRef}></div>
