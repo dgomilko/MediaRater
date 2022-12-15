@@ -1,5 +1,5 @@
 import numpy as np
-from recommender.model import model
+from services.recommender.model import model
 from scipy.sparse import coo_matrix
 from extensions import celery, cache
 from dao.review.review_daos import *

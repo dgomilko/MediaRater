@@ -64,7 +64,6 @@ export default function ChartComponent({ data, chartOptions }) {
 
   const defaultOptions = {
     plugins: {
-      legend: { display: false },
       tooltip: {
         callbacks: {
           label: context => {

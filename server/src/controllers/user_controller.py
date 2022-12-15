@@ -7,7 +7,7 @@ from constants.err_messages import *
 from dao.token.tokenDao import TokenDao
 from security_utils.tokens import encode_token
 from security_utils.passwd_encryption import check_passwd
-from recommender.recommender_task import get_recommendations
+from services.recommender.recommender_task import get_recommendations
 
 @expected_fields(['name', 'email', 'password', 'birthday', 'country', 'gender'])
 def register() -> tuple[dict, int]:

@@ -8,7 +8,8 @@ from dao.product.ProductDao import ProductDao
 from dao.review.review_daos import *
 from constants.err_messages import *
 from dao.product.product_daos import *
-from recommender.recommender_task import update_model
+from services.stats_analyzer.stats import process_stats
+from services.recommender.recommender_task import update_model
 from controllers.decorators import authorization_needed, expected_fields
 
 @expected_fields(['id', 'user_id'])
@@ -30,7 +31,8 @@ def description(
 def get_stats(dao: ProductDao) -> tuple[dict, int]:
   pid = request.get_json()['id']
   stats = dao.stats(pid)
-  valid_res = {'stats': stats}, HTTPStatus.OK
+  data = process_stats(stats)
+  valid_res = {'stats': process_stats(stats)}, HTTPStatus.OK
   return valid_res if reviews else err_response(
     ErrMsg.NO_STATS,
     HTTPStatus.NOT_FOUND
