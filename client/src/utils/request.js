@@ -11,7 +11,6 @@ const request = async (method, route, body, options, token) => {
   const url = `${process.env.REACT_APP_SERVER}/${route}`;
   try {
     const response = await fetch(url, requestInfo);
-    console.log({response});
     const json = await response.json();
     options.responseHandler(response, json);
   } catch (e) {

@@ -5,7 +5,7 @@ import pageReducer from '../../reducers/pageReducer';
 import defaultOptions from '../defaultOptions';
 import { mainApi } from '../../api/mainApi';
 
-export default function useFetchReviews(type, onReload = false) {
+export default function useFetchReviews(type, searchOptions = {}) {
   const params = useParams();
   const [reviewsData, reviewsDispatch] =
     useReducer(productsReducer, { data: [] });
@@ -14,12 +14,15 @@ export default function useFetchReviews(type, onReload = false) {
   const { options, data, error, setError, loading, setLoading } =
     defaultOptions();
   const { id } = params;
-  const deps = [pageData.page];
-  if (onReload) deps.push(params);
+  const deps = [pageData];
 
   useEffect(() => {
     if (!id) return;
-    mainApi[`${type}Reviews`]({ id, page: pageData.page }, options);
+    console.log('trigger', searchOptions)
+    mainApi[`${type}Reviews`](
+      { id, page: pageData.page, ...searchOptions },
+      options
+    );
   }, deps);
 
   useEffect(() => {

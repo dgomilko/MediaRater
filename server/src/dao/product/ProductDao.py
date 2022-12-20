@@ -6,7 +6,7 @@ import numpy as np
 from extensions import db
 from db.models import *
 from dao.model_mappers import *
-from dao.reviews_loader import limit_per_page
+from dao.reviews_loader import limit_per_page, filter
 from db.models import MediaProduct, Genre, product_genres
 
 class ProductDao(Dao):
@@ -59,10 +59,15 @@ class ProductDao(Dao):
   
   @staticmethod
   @limit_per_page(10)
+  @filter
   def get_product_reviews(
     pid: str,
     page: int,
-    model: db.Model
+    model: db.Model,
+    min_rate: int = 0,
+    max_rate: int = 5,
+    filter: str = 'date',
+    order: str = 'desc'
   ) -> tuple[list[dict], bool]:
     result = super(ProductDao, ProductDao).get_by_id(model, pid)
     return result.reviews if result else None

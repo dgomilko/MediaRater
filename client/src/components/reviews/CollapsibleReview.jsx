@@ -15,14 +15,14 @@ export default function CollapsibleReview({ header, product }) {
   const ref = useRef();
   const [expandBtn, setExpandBtn] = useState(false);
   const [expanded, setExpanded] = useState(false);
-  const clampedHeight = 130;
 
   useEffect(() => {
-    if (ref.current.scrollHeight > clampedHeight) {
+    if (!ref.current) return;
+    if (ref.current.offsetWidth < ref.current.scrollWidth) {
       setExpandBtn(true);
       setExpanded(false);
     }
-  }, []);
+  }, [ref]);
 
   const expandStyle = {
     'whiteSpace': 'nowrap',
@@ -31,10 +31,7 @@ export default function CollapsibleReview({ header, product }) {
   }
 
   return (
-    <div
-      className={reviewTextWrapper}
-      ref={ref}
-    >
+    <div className={reviewTextWrapper}>
       <div className={reviewAuthorWrapper}>
         <div>
           <Rating className={rating} rating={product.rate} />
@@ -52,8 +49,9 @@ export default function CollapsibleReview({ header, product }) {
         </div>
       </div>
         <p
+          ref={ref}
           className={reviewText}
-          style={expanded ? {} : expandStyle}
+          style={expanded ? {} : expandStyle} 
         >
           {product.text || ''}
         </p>

@@ -17,7 +17,7 @@ def get_top_countries(stats):
   all_countries = list(set([s['country'] for s in stats]))
   count = [{
     'country': c,
-    'count': len(list(filter(lambda s: ['country'] == s, stats)))
+    'count': len(list(filter(lambda s: s['country'] == c, stats)))
   } for c in all_countries]
   count.sort(reverse=True, key=lambda c: c['count'])
   top = count[:top_n]

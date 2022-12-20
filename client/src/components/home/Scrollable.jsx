@@ -11,7 +11,7 @@ export default function Scrollable({ data, type }) {
   const navigate = useNavigate();
 
   const onProductClick = id =>
-    navigate(`/${type.slice(0, type.length - 1)}/${id}`);
+    navigate(`/${type}/${id}`);
   
   return (
     <div className={horizontalWrapper}>

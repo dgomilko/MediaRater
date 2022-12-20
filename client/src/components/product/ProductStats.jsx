@@ -9,18 +9,20 @@ import {
 } from '../../styles/components/product/ProductStats.module.scss';
 
 export default function ProductStats({ type }) {
-  const [chartOption, setChartOption] = useState('Viewers by age');
+  const [chartOption, setChartOption] = useState('Average rating over time');
   const { data, error, loading } = useFetchStats(type);
 
   const charts = {
-    'Viewers by age': ['Bar', 'Pie', 'Doughnut', 'Polar', 'Radar'],
-    'Viewers by gender': ['Bar', 'Pie', 'Doughnut', 'Polar'],
-    'Viewers by country': ['Bar', 'Pie', 'Doughnut', 'Polar', 'Radar'],
+    'Average rating over time': ['Time'],
+    'Ratings over time': ['Time'],
     'Rating by gender': ['Grouped bar', 'Stacked bar', 'Radar'],
     'Rating by age': ['Stacked bar', 'Grouped bar'],
     'Rating distribution': ['Bar', 'Pie', 'Doughnut', 'Polar', 'Radar'],
+    'Popularity over time': ['Time'],
+    'Viewers by age': ['Bar', 'Pie', 'Doughnut', 'Polar', 'Radar'],
+    'Viewers by gender': ['Bar', 'Pie', 'Doughnut', 'Polar'],
+    'Viewers by country': ['Bar', 'Pie', 'Doughnut', 'Polar', 'Radar'],
   };
-  console.log(data)
   const options = data.stats ? Object.entries(data.stats)
     .reduce((obj, [type, desc]) => ({
       ...obj,

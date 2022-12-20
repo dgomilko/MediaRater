@@ -1,13 +1,17 @@
 from services.stats_analyzer.utils import *
-
+from itertools import groupby
 
 def process_stats(stats):
   gender_labels = ['female', 'male']
   rating_labels = list(range(6))
   countries = get_top_countries(stats)
   age_gaps = get_age_groups()
-  print([gape for gape in age_gaps])
   age_labels = ['-'.join([str(y) for y in gap]) for gap in age_gaps]
+
+  date_grouped = [({
+      'x': key,
+      'y': list(group),
+    }) for key, group in groupby(stats, key=lambda x: x['created'])]
 
   age_fn = lambda gap, x: x['age'] >= gap[0] and x['age'] <= gap[1]
   gen_fn = lambda gen, x: x['gender'] == gen[0]
@@ -90,6 +94,42 @@ def process_stats(stats):
           'data': [filtered_len(lambda x: fns['rate'](r, x))
             for r in rating_labels],
           'backgroundColor': [gen_color() for _ in rating_labels]
+        }]
+      }
+    },
+
+    'Average rating over time': {
+      'chartData': {
+        'labels': [],
+        'datasets': [{
+          'label': 'Average rating',
+          'data': [{
+            **g,
+            'y': round(sum([x['rate'] for x in g['y']]) / len(g['y']), 2)
+          } for g in date_grouped],
+          'borderColor': gen_color()
+        }]
+      }
+    },
+
+    'Ratings over time': {
+      'chartData': {
+        'labels': [],
+        'datasets': [{
+          'label': rate,
+          'data': [{**g, 'y': len([x for x in g['y'] if rate_fn(rate, x)])} for g in date_grouped],
+          'borderColor': gen_color()
+        } for rate in rating_labels]
+      }
+    },
+
+    'Popularity over time': {
+      'chartData': {
+        'labels': [],
+        'datasets': [{
+          'label': 'Reviews count',
+          'data': [{**g, 'y': len(g['y'])} for g in date_grouped],
+          'borderColor': gen_color()
         }]
       }
     },

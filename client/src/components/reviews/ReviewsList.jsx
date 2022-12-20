@@ -1,15 +1,35 @@
 import React from 'react';
 import CollapsibleReview from './CollapsibleReview';
 import ErrorWrapper from '../ErrorWrapper';
+import Loading from '../Loading';
+import Filter from './Filter';
 import {
+  mainContainer,
   reviewsWrapper,
   loadMore,
   btnWrapper
 } from '../../styles/components/reviews/ReviewsList.module.scss';
 
-export default function ReviewsList({ header, data, error, dispatch, available }) {
+export default function ReviewsList(
+  {
+    loading,
+    loadingStyle,
+    header,
+    data,
+    error,
+    dispatch,
+    available,
+    options,
+    setOptions,
+    onClick,
+  }
+) {
+
   return (
-    <ErrorWrapper error={error}>
+  <div className={mainContainer}>
+    <Filter options={options} setOptions={setOptions} onClick={onClick} />
+    {loading ? <div style={{width: '60%'}}><Loading style={loadingStyle} /></div> :
+    <ErrorWrapper style={{width: '60%'}} error={error}>
       <div className={reviewsWrapper}>
         <div>
           {data?.map(p =>
@@ -25,6 +45,7 @@ export default function ReviewsList({ header, data, error, dispatch, available }
           </div>
         </div>
       </div>
-    </ErrorWrapper>
+    </ErrorWrapper>}
+  </div>
   );
 };

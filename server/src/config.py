@@ -12,7 +12,9 @@ default_params = {
 	'TOKEN_EXP_MINS': 45,
 	'REDIS_URL': 'redis://:localhost:6379/0',
 	'HOST': 'localhost',
-	'PORT': 5000
+	'PORT': 5000,
+	'CACHE_MEMCACHED_SERVERS': 'localhost:11211',
+	'CACHE_EXPIRATION_MIN': 30
 }
 
 def load_env(name):
@@ -32,7 +34,9 @@ class Config():
 	CELERY_RESULT_BACKEND = load_env('REDIS_URL')
 	TOKEN_EXP_MINS = load_env('TOKEN_EXP_MINS')
 	SERVER_NAME = f'{load_env("HOST")}:{load_env("PORT")}'
-	CACHE_MEMCACHED_SERVERS = 'localhost:11211'
+	CELERY_RESULT_BACKEND = load_env('REDIS_URL')
+	CACHE_EXPIRATION = load_env('CACHE_EXPIRATION_MIN') * 60
+	CACHE_MEMCACHED_SERVERS = load_env('CACHE_MEMCACHED_SERVERS')
 
 class DevelopmentConfig(Config):
 	ENV = 'development'

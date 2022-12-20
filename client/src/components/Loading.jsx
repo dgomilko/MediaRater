@@ -1,9 +1,9 @@
 import React from 'react';
 import { loadingWrapper } from '../styles/components/Loading.module.scss';
 
-export default function Loading() {
+export default function Loading({ style }) {
   return (
-    <div className={loadingWrapper}>
+    <div style={style} className={loadingWrapper}>
       Loading...
     </div>
   );

@@ -2,7 +2,7 @@ from dao.dao import Dao
 from extensions import db
 from db.models import User
 from dao.model_mappers import user_mapper
-from dao.reviews_loader import limit_per_page
+from dao.reviews_loader import limit_per_page, filter
 
 class UserDao(Dao):
 
@@ -27,10 +27,15 @@ class UserDao(Dao):
 
   @staticmethod
   @limit_per_page(10)
+  @filter
   def get_reviews(
     uid: str,
     page: int,
-    attr: str
+    attr: str,
+    min_rate: int = 0,
+    max_rate: int = 5,
+    filter: str = 'date',
+    order: str = 'desc'
   ) -> tuple[list[dict], bool]:
     result = super(UserDao, UserDao).get_by_id(User, uid)
     return getattr(result, f'{attr}_reviews') if result else None

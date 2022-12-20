@@ -1,0 +1,6 @@
+@use '../utils' as u;
+
+.wrapper {
+  @include u.flex(column, $align: center, $justify: center);
+  margin-left: 4%;
+}

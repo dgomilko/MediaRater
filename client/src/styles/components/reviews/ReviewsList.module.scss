@@ -15,3 +15,7 @@
   @extend .submitBtn;
   margin: 1% auto;
 }
+
+.mainContainer {
+  @include u.flex(row, $align: flex-start, $justify: space-between);
+}

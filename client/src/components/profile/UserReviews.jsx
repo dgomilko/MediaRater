@@ -1,8 +1,7 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import useFetchReviews from '../../hooks/review/useFetchReviews';
 import ReviewsList from '../reviews/ReviewsList';
-import Loading from '../Loading';
 import {
   authorWrapper,
   logoWrapper,
@@ -10,6 +9,7 @@ import {
 } from '../../styles/components/product/ProductReviews.module.scss';
 
 export default function UserReviews({ type }) {
+  const [options, setOptions] = useState({});
   const location = useLocation();
   const navigate = useNavigate();
   const {
@@ -21,13 +21,19 @@ export default function UserReviews({ type }) {
     data,
     loading,
     setLoading
-  } = useFetchReviews(`user${type}`, true);
+  } = useFetchReviews(`user${type}`, options);
 
-  useEffect(() => {
+  const resetPage = () => {
     setError('');
     setLoading(true);
     reviewsDispatch({type: 'CLEAR'});
     pageDispatch({type: 'CLEAR'});
+  };
+
+  useEffect(() => {
+    if (!Object.keys(options).length) return;
+    setOptions({});
+    resetPage();
   }, [location]);
 
   const onProductClick = id => navigate(`/${type}/${id}`);
@@ -46,11 +52,15 @@ export default function UserReviews({ type }) {
     </div>
   );
   
-  return loading ? <Loading /> : <ReviewsList
+  return <ReviewsList
+    setOptions={setOptions}
+    options={options}
     header={reviewHeader}
+    loading={loading}
     data={reviewsData.data}
     available={data.next_available}
     error={error}
     dispatch={pageDispatch}
+    onClick={resetPage}
   />;
 };

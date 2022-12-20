@@ -11,5 +11,5 @@ celery = Celery(
 cache = Cache(config={
   'CACHE_TYPE': 'MemcachedCache',
   'CACHE_MEMCACHED_SERVERS': [Config.CACHE_MEMCACHED_SERVERS],
-  'CACHE_DEFAULT_TIMEOUT': 60,
+  'CACHE_DEFAULT_TIMEOUT': Config.CACHE_EXPIRATION,
 })

@@ -1,9 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useFetchReviews from '../../hooks/review/useFetchReviews';
 import ReviewsList from '../reviews/ReviewsList';
 import AccLogo from '../profile/AccLogo';
-import Loading from '../Loading';
 import {
   authorWrapper,
   accLogo,
@@ -12,12 +11,29 @@ import {
 } from '../../styles/components/product/ProductReviews.module.scss';
 
 export default function ProductReviews({ type }) {
+  const [options, setOptions] = useState({});
   const navigate = useNavigate();
 
-  const { pageDispatch, reviewsData, error, data, loading } =
-    useFetchReviews(type);
+  const {
+    pageDispatch,
+    reviewsDispatch,
+    reviewsData,
+    error,
+    data,
+    loading,
+    setError,
+    setLoading
+  } =
+    useFetchReviews(type, options);
 
   const onUserClick = id => navigate(`/user/${id}`);
+
+  const onClick = () => {
+    pageDispatch({ type: 'CLEAR' });
+    reviewsDispatch({ type: 'CLEAR' });
+    setError(''),
+    setLoading(true)
+  };
 
   const reviewHeader = (product) => (
     <div className={authorWrapper}>
@@ -29,12 +45,16 @@ export default function ProductReviews({ type }) {
     </div>
   );
 
-  return loading ? <div style={{'height': '150px'}}><Loading /></div> :
-    <ReviewsList
+  return <ReviewsList
+      setOptions={setOptions}
+      options={options}
+      loading={loading}
+      loadingStyle={{'height': '150px'}}
       header={reviewHeader}
       data={reviewsData.data}
       available={data.next_available}
       error={error}
       dispatch={pageDispatch}
+      onClick={onClick}
     />;
 };

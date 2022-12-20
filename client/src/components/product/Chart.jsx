@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
+import 'chartjs-adapter-moment';
 import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
+  TimeScale,
   RadialLinearScale,
   BarElement,
   PointElement,
@@ -13,7 +15,14 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
-import { Bar, Pie, Doughnut, PolarArea, Radar } from 'react-chartjs-2';
+import {
+  Bar,
+  Pie,
+  Doughnut,
+  PolarArea,
+  Radar,
+  Line
+} from 'react-chartjs-2';
 import {
   chartWrapper,
   optionsWrapper,
@@ -23,6 +32,7 @@ import {
 ChartJS.register(
   CategoryScale,
   LinearScale,
+  TimeScale,
   RadialLinearScale,
   BarElement,
   PointElement,
@@ -60,18 +70,31 @@ export default function ChartComponent({ data, chartOptions }) {
         }
       }
     },
+    'Time': {
+      Chart: Line,
+      options: {
+        scales: {
+          x: {
+            type: 'time',
+            time: { parser: 'DD.MM.YYYY', unit: 'day' }
+          },
+        }
+      }
+    }
   };
 
   const defaultOptions = {
     plugins: {
+      legend: { display: chartType !== 'Bar' },
       tooltip: {
         callbacks: {
           label: context => {
             const { label, formattedValue: value} = context;
             const dataArr = context.chart.data.datasets[0].data;
             const sum = dataArr.reduce((a, b) => a + b, 0);
-            const percentage = (value * 100 / sum).toFixed(2) + '%';
-            return `${label}: ${percentage}`;
+            const val = (value * 100 / sum).toFixed(2);
+            return isNaN(val) || val == Infinity ?
+              label : `${label}: ${val}%`;
           }
         }
       }
@@ -97,8 +120,8 @@ export default function ChartComponent({ data, chartOptions }) {
       </div>
       <div style={{width: expanded ? '100%' : '600px'}}>
         <Chart
-          data={data}
           options={Object.assign(defaultOptions, options || {})}
+          data={data}
         />
       </div>
     </div>

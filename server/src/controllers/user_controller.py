@@ -6,6 +6,7 @@ from controllers.decorators import *
 from constants.err_messages import *
 from dao.token.tokenDao import TokenDao
 from security_utils.tokens import encode_token
+from controllers.utils import get_kwargs
 from security_utils.passwd_encryption import check_passwd
 from services.recommender.recommender_task import get_recommendations
 
@@ -56,7 +57,13 @@ def get_reviews(prod_type: str) -> tuple[dict, int]:
   correct_type = prod_type in ['movie', 'book', 'show']
   if not correct_type:
     return err_response(ErrMsg.INVALID, HTTPStatus.BAD_REQUEST)
-  result = UserDao.get_reviews(data['id'], data['page'], prod_type)
+  kwargs = get_kwargs(data)
+  result = UserDao.get_reviews(
+    data['id'],
+    data['page'],
+    prod_type,
+    **kwargs
+  )
   if not result: return err_response(
     ErrMsg.NO_REVIEWS,
     HTTPStatus.NOT_FOUND

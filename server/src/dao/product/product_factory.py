@@ -18,8 +18,12 @@ def product_dao_factory(
       **common
     }
 
-  def get_reviews(pid: str, page: int) -> tuple[list[dict], bool]:
-    return ProductDao.get_product_reviews(pid, page, model)
+  def get_reviews(
+    pid: str,
+    page: int,
+    **kwargs
+  ) -> tuple[list[dict], bool]:
+    return ProductDao.get_product_reviews(pid, page, model, **kwargs)
 
   def get_ids() -> list[dict]:
     return [x[0] for x in ProductDao.get_all_ids(model)]

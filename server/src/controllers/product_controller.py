@@ -1,13 +1,13 @@
 import re
 from http import HTTPStatus
 from flask import request
-from extensions import celery
 from dao.user.userDao import UserDao
 from dao.review.ReviewDao import ReviewDao 
 from dao.product.ProductDao import ProductDao
 from dao.review.review_daos import *
 from constants.err_messages import *
 from dao.product.product_daos import *
+from controllers.utils import get_kwargs
 from services.stats_analyzer.stats import process_stats
 from services.recommender.recommender_task import update_model
 from controllers.decorators import authorization_needed, expected_fields
@@ -31,7 +31,6 @@ def description(
 def get_stats(dao: ProductDao) -> tuple[dict, int]:
   pid = request.get_json()['id']
   stats = dao.stats(pid)
-  data = process_stats(stats)
   valid_res = {'stats': process_stats(stats)}, HTTPStatus.OK
   return valid_res if reviews else err_response(
     ErrMsg.NO_STATS,
@@ -41,7 +40,8 @@ def get_stats(dao: ProductDao) -> tuple[dict, int]:
 @expected_fields(['id', 'page'])
 def reviews(dao: ProductDao) -> tuple[dict, int]:
   data = request.get_json()
-  result = dao.get_reviews(data['id'], data['page'])
+  kwargs = get_kwargs(data)
+  result = dao.get_reviews(data['id'], data['page'], **kwargs)
   if not result:
     return err_response(ErrMsg.NO_REVIEWS, HTTPStatus.NOT_FOUND)
   reviews, next_available = result

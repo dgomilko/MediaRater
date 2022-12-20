@@ -1,3 +1,5 @@
+from concurrent.futures import thread
+import os
 import numpy as np
 from services.recommender.model import model
 from scipy.sparse import coo_matrix
@@ -71,7 +73,8 @@ def train_model(
   matrix = create_matrix(lookups, dims, rates)
   cache.set(key, matrix)
   sparse_mat = coo_matrix(matrix)
-  model.fit(sparse_mat, epochs=30, num_threads=8)
+  threads = len(os.sched_getaffinity(0))
+  model.fit(sparse_mat, epochs=30, num_threads=threads)
   return matrix
 
 def ids_to_info(ids: list[str], dao: ProductDao) -> list[dict]:
