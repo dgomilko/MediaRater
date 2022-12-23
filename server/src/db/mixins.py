@@ -4,13 +4,14 @@ from security_utils.id_gen import generate_key
 from extensions import db
 
 class IntIdMixin(object):
-  id = db.Column(db.Integer, primary_key=True)
+  id = db.Column(db.Integer, primary_key=True, nullable=False)
 
 class StrIdMixin(object):
   id = db.Column(
     db.String(22),
     primary_key=True,
     autoincrement=False,
+    nullable=False,
     default=generate_key
   )
 
@@ -20,7 +21,7 @@ class ProductMixin(StrIdMixin, object):
     return db.Column(
       db.Integer,
       db.ForeignKey('media_products.id'),
-      nullable=True
+      nullable=False
     )
 
   @declared_attr
@@ -43,14 +44,16 @@ class ReviewMixin(IntIdMixin, object):
   rate = db.Column(db.Integer, nullable=False)
   created = db.Column(
     db.DateTime(timezone=True),
-    default=func.now()
+    default=func.now(),
+    nullable=False
   )
 
   @declared_attr
   def user_id(cls):
     return db.Column(
     db.String(22),
-    db.ForeignKey('users.id')
+    db.ForeignKey('users.id'),
+    nullable=False
   )
 
   @declared_attr

@@ -7,11 +7,17 @@ from db.mixins import *
 
 product_genres = db.Table(
     'product_genres',
-    db.Column("genre_id", db.ForeignKey('genres.id'), primary_key=True),
+    db.Column(
+      'genre_id',
+      db.ForeignKey('genres.id'),
+      primary_key=True,
+      nullable=False
+    ),
     db.Column(
       'product_id',
       db.ForeignKey('media_products.id'),
-      primary_key=True
+      primary_key=True,
+      nullable=False
     ),
 )
 
@@ -49,11 +55,11 @@ class Show(ProductMixin, db.Model):
 class User(StrIdMixin, db.Model):
   __tablename__ = 'users'
   name = db.Column(db.String(50), nullable=False)
-  email = db.Column(db.String(100), unique=True)
-  _password = db.Column(db.String(100))
-  country = db.Column(db.String(50))
-  birthday = db.Column(db.DateTime)
-  gender = db.Column(db.String(1))
+  email = db.Column(db.String(100), unique=True, nullable=False)
+  _password = db.Column(db.String(100), nullable=False)
+  country = db.Column(db.String(50), nullable=False)
+  birthday = db.Column(db.DateTime, nullable=False)
+  gender = db.Column(db.String(1), nullable=False)
   movie_reviews = db.relationship(
     'MovieReview',
     back_populates='user',
@@ -87,7 +93,8 @@ class MovieReview(ReviewMixin, db.Model):
   __tablename__ = 'movie_reviews'
   product_id = db.Column(
     db.String(22),
-    db.ForeignKey('movies.id')
+    db.ForeignKey('movies.id'),
+    nullable=False
   )
   product = db.relationship(
     'Movie',
@@ -99,7 +106,8 @@ class BookReview(ReviewMixin, db.Model):
   __tablename__ = 'book_reviews'
   product_id = db.Column(
     db.String(22),
-    db.ForeignKey('books.id')
+    db.ForeignKey('books.id'),
+    nullable=False
   )
   product = db.relationship(
     'Book',
@@ -111,7 +119,8 @@ class ShowReview(ReviewMixin, db.Model):
   __tablename__ = 'show_reviews'
   product_id = db.Column(
     db.String(22),
-    db.ForeignKey('shows.id')
+    db.ForeignKey('shows.id'),
+    nullable=False
   )
   product = db.relationship(
     'Show',

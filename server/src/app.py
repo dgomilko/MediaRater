@@ -22,4 +22,5 @@ def create_app(populate=False) -> Flask:
 
 if __name__ == '__main__':
   populate = conf_db_populate()
-  create_app(populate).run()
+  app = create_app(populate)
+  app.run()
