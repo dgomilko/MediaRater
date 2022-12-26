@@ -10,7 +10,13 @@ from apps.err_handler import register_err_handler
 from apps.products_list.routes import products_list
 
 def create_app(populate=False) -> Flask:
-  apps = [authenticate, user, product, recommend, products_list]
+  apps = [
+    authenticate,
+    user,
+    product,
+    recommend,
+    products_list
+  ]
   app = Flask(__name__)
   app.config.from_object('config.DevelopmentConfig')
   register_err_handler(app)

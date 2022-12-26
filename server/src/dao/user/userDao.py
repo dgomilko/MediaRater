@@ -1,10 +1,15 @@
 from dao.dao import Dao
 from extensions import db
-from db.models import User
+from db.models import MediaProduct, User, Review, Movie, Book, Show
 from dao.model_mappers import user_mapper
 from dao.reviews_loader import limit_per_page, filter
 
 class UserDao(Dao):
+  types = {
+    'movie': Movie,
+    'show': Show,
+    'book': Book
+  }
 
   @staticmethod
   def add_user(user_data: dict) -> dict:
@@ -31,20 +36,26 @@ class UserDao(Dao):
   def get_reviews(
     uid: str,
     page: int,
-    attr: str,
+    product: str,
     min_rate: int = 0,
     max_rate: int = 5,
     filter: str = 'date',
     order: str = 'desc'
   ) -> tuple[list[dict], bool]:
-    result = super(UserDao, UserDao).get_by_id(User, uid)
-    return getattr(result, f'{attr}_reviews') if result else None
+    prod_model = UserDao.types[product]
+    return db.session \
+      .query(Review, prod_model.id) \
+      .filter_by(user_id=uid) \
+      .join(MediaProduct, MediaProduct.id == Review.product_id) \
+      .join(prod_model, MediaProduct.id == prod_model.product_id)
 
   @staticmethod
   def count_reviews(uid: str, attr: str) -> int:
     result = super(UserDao, UserDao).get_by_id(User, uid)
-    return len(list(getattr(result, f'{attr}_reviews'))) if result \
-      else 0
+    return len(list(
+      Review.query.join(MediaProduct)
+        .join(UserDao.types[attr]).all()
+    )) if result else 0
 
   @staticmethod
   def get_ids() -> list[str]:

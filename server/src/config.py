@@ -35,7 +35,7 @@ class Config():
 	TOKEN_EXP_MINS = load_env('TOKEN_EXP_MINS')
 	SERVER_NAME = f'{load_env("HOST")}:{load_env("PORT")}'
 	CELERY_RESULT_BACKEND = load_env('REDIS_URL')
-	CACHE_EXPIRATION = load_env('CACHE_EXPIRATION_MIN') * 60
+	CACHE_EXPIRATION = int(load_env('CACHE_EXPIRATION_MIN')) * 60
 	CACHE_MEMCACHED_SERVERS = load_env('CACHE_MEMCACHED_SERVERS')
 
 class DevelopmentConfig(Config):

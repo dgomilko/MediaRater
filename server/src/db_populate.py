@@ -7,7 +7,7 @@ from dao.review.review_daos import *
 from dao.review.ReviewDao import ReviewDao
 from db.models import *
 
-LIMIT = 500
+LIMIT = 50
 SHOWS_PATH = './media_data/shows.csv'
 MOVIES_PATH = './media_data/movies.csv'
 BOOKS_PATH = './media_data/books.csv'
@@ -72,9 +72,9 @@ users = [
 ]
 
 db_details = {
-  MOVIES_PATH: [Movie, MovieDao, MovieReviewDao],
-  BOOKS_PATH: [Book, BookDao, BookReviewDao],
-  SHOWS_PATH: [Show, ShowDao, ShowReviewDao]
+  MOVIES_PATH: [Movie, MovieDao, 'movie'],
+  BOOKS_PATH: [Book, BookDao, 'book'],
+  SHOWS_PATH: [Show, ShowDao, 'show']
 }
 
 def populate_product(
@@ -91,12 +91,12 @@ def populate_product(
 
 def populate_reviews(
   products: list[dict],
-  review_dao: ReviewDao,
+  review_type: str,
   product_model: any
 ):
   for user in users:
     db_user = User.query.filter_by(name=user['name']).first()
-    reiewed_products = sample(products, randint(0, 250))
+    reiewed_products = sample(products, randint(0, 40))
     for product in reiewed_products:
       db_product = product_model.query.join(MediaProduct) \
         .filter_by(title=product['title']).first()
@@ -105,7 +105,7 @@ def populate_reviews(
         'product_id': db_product.id,
         'rate': randint(0, 5)
       }
-      review_dao.add_new(review_data)
+      ReviewDao.add_new(review_data, review_type)
 
 def populate_db():
   for user in users: UserDao.add_user(user)

@@ -14,7 +14,7 @@ from controllers.decorators import authorization_needed, expected_fields
 
 @expected_fields(['id', 'user_id'])
 def description(
-  review_dao: ReviewDao,
+  review_type: str,
   product_dao: ProductDao
 ) -> tuple[dict, int]:
   data = request.get_json()
@@ -22,7 +22,7 @@ def description(
   found_product = product_dao.get_by_id(pid)
   if not found_product:
     return err_response(ErrMsg.NO_CONTENT, HTTPStatus.NOT_FOUND)
-  reviewed = review_dao.reviewed(data['user_id'], pid)
+  reviewed = ReviewDao.reviewed(data['user_id'], pid, review_type)
   rate = reviewed['rate'] if reviewed else None
   valid_res = {**found_product, 'reviewed': rate}, HTTPStatus.OK
   return valid_res
@@ -49,7 +49,7 @@ def reviews(dao: ProductDao) -> tuple[dict, int]:
 
 @expected_fields(['rate', 'user_id', 'product_id'])
 @authorization_needed
-def add_review(review_dao: ReviewDao, product_dao: ProductDao):
+def add_review(review_type: str, product_dao: ProductDao):
   data = request.get_json()
   uid = data['user_id']
   pid = data['product_id']
@@ -60,10 +60,10 @@ def add_review(review_dao: ReviewDao, product_dao: ProductDao):
   product_exists = product_dao.get_by_id(pid)
   if not product_exists:
     return err_response(ErrMsg.NO_PRODUCT, HTTPStatus.NOT_FOUND)
-  already_reviewed = review_dao.reviewed(uid, pid)
+  already_reviewed = ReviewDao.reviewed(uid, pid, review_type)
   if already_reviewed:
     return err_response(ErrMsg.REVIEWED, HTTPStatus.FORBIDDEN)
-  added = review_dao.add_new(data)
+  added = ReviewDao.add_new(data, review_type)
   name_str = re.findall(
     '[A-Z][^A-Z]*', product_dao.__name__
   )[0].lower()

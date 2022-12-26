@@ -21,8 +21,7 @@ review_mapper = lambda r: {
   'rate': r.rate,
   'author': r.user.name,
   'author_id': r.user_id,
-  'product': r.product.product.title,
-  'product_id': r.product_id,
+  'product': r.product.title,
   'created': date_frmt(r),
 }
 
@@ -47,5 +46,5 @@ user_mapper = lambda u: {
   'country': u.country,
   'gender': u.gender,
   'password': u.password,
-  'reviews': len(u.book_reviews.all() + u.show_reviews.all() + u.movie_reviews.all()),
+  'reviews': len(u.reviews.all()),
 }

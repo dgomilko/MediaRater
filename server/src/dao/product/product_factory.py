@@ -5,7 +5,6 @@ def product_dao_factory(
   name: str,
   specific_args: list[str],
   model: db.Model,
-  review_model: db.Model
 ):
   def add_new(data: dict) -> bool:
     speial_values = {key: data[key] for key in specific_args}
@@ -30,7 +29,7 @@ def product_dao_factory(
 
   def load(page: int, **kwargs) -> list[dict]:
     return ProductDao \
-      .load_products(page, model, review_model, **kwargs)
+      .load_products(page, model, **kwargs)
 
   def stats(pid: str) -> list[dict]:
     return ProductDao.get_stats(pid, model)

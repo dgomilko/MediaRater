@@ -7,7 +7,7 @@ from extensions import db
 from db.models import *
 from dao.model_mappers import *
 from dao.reviews_loader import limit_per_page, filter
-from db.models import MediaProduct, Genre, product_genres
+from db.models import MediaProduct, Genre, Movie, Book, Review, product_genres
 
 class ProductDao(Dao):
   @staticmethod
@@ -47,7 +47,7 @@ class ProductDao(Dao):
     rating = ProductDao.__get_rating(result)
     common = product_mapper(result)
     common['rating'] = rating
-    common['reviews'] = len(result.reviews.all())
+    # common['reviews'] = len(result.reviews.all())
     return (result, common)
 
   @staticmethod
@@ -80,7 +80,6 @@ class ProductDao(Dao):
   def load_products(
     page: int,
     model: db.Model,
-    review_model: db.Model,
     order: str ='desc',
     filter: str = 'popular',
     min_rate: int = 0,
@@ -95,19 +94,19 @@ class ProductDao(Dao):
     order_fn = globals()[order]
     null_order = nullsfirst if order == 'asc' else nullslast
     rate_filter = and_(
-      min_rate <= func.avg(review_model.rate),
-      func.avg(review_model.rate) <= max_rate
+      min_rate <= func.avg(Review.rate),
+      func.avg(Review.rate) <= max_rate
     )
     year_filter_needed = max_year or min_year
     sorting = {
       'title': order_fn(MediaProduct.title),
       'rating': null_order(order_fn('rating')),
-      'popular': null_order(order_fn(func.count(review_model.rate))),
+      'popular': null_order(order_fn(func.count(Review.rate))),
     }
     query = db.session.query(
         model,
-        func.avg(review_model.rate).label('rating'),
-      ).outerjoin(review_model) \
+        func.avg(Review.rate).label('rating'),
+      ).outerjoin(Review, Review.id == model.product_id) \
       .join(MediaProduct)
     if year_filter_needed:
       year_filter = and_(

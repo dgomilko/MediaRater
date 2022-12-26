@@ -1,10 +1,9 @@
-from concurrent.futures import thread
 import os
 import numpy as np
+from dao.review.ReviewDao import ReviewDao
 from services.recommender.model import model
 from scipy.sparse import coo_matrix
 from extensions import celery, cache
-from dao.review.review_daos import *
 from dao.product.product_daos import *
 from dao.product.ProductDao import ProductDao
 from dao.user.userDao import UserDao
@@ -29,7 +28,6 @@ def get_recommendations(
     np.array(reviews),
     key
   )
-  else: print('USING TRAINED MODEL')
   mapped_uid = np.where(lookup_uid == user_id)[0][0]
   unrated = np.where(matrix[mapped_uid] == 0)[0]
   predicted = model.predict(user_ids=int(mapped_uid), item_ids=unrated)
@@ -69,7 +67,6 @@ def train_model(
   rates: np.ndarray,
   key: str,
 ):
-  print('TRAINING MODEL')
   matrix = create_matrix(lookups, dims, rates)
   cache.set(key, matrix)
   sparse_mat = coo_matrix(matrix)
@@ -87,12 +84,12 @@ def ids_to_info(ids: list[str], dao: ProductDao) -> list[dict]:
 
 def get_params(dao_type):
   types = {
-    'movie': (MovieReviewDao, MovieDao),
-    'show': (ShowReviewDao, ShowDao),
-    'book': (BookReviewDao, BookDao)
+    'movie': MovieDao,
+    'show': ShowDao,
+    'book': BookDao
   }
-  review_dao, product_dao = types[dao_type]
-  reviews = review_dao.get_ratings()
+  product_dao = types[dao_type]
+  reviews = ReviewDao.get_ratings(dao_type)
   pids = product_dao.get_ids()
   uids = UserDao.get_ids()
   lookup_uid, _ = np.unique(uids, return_inverse=True)
