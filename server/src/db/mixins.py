@@ -1,5 +1,4 @@
 from sqlalchemy.orm import declared_attr
-from sqlalchemy.sql import func
 from security_utils.id_gen import generate_key
 from extensions import db
 
@@ -30,33 +29,13 @@ class ProductMixin(StrIdMixin, object):
       backref=cls.__name__.lower(),
     )
 
-  # @declared_attr
-  # def reviews(cls):
-  #   return db.relationship(
-  #     f'{cls.__name__}Review',
-  #     back_populates='product',
-  #     lazy='dynamic'
-  #   )
-
-# class ReviewMixin(IntIdMixin, object):
-#   text = db.Column(db.Text, nullable=True)
-#   rate = db.Column(db.Integer, nullable=False)
-#   created = db.Column(
-#     db.DateTime(timezone=True),
-#     default=func.now()
-#   )
-
-#   @declared_attr
-#   def user_id(cls):
-#     return db.Column(
-#     db.String(22),
-#     db.ForeignKey('users.id')
-#   )
-
-#   @declared_attr
-#   def user(cls):
-#     return db.relationship(
-#       'User',
-#       back_populates=cls.__tablename__,
-#       uselist=False
-#     )
+  @declared_attr
+  def reviews(cls):
+    return db.relationship(
+    'Review',
+      secondary='media_products',
+      primaryjoin=f'{cls.__name__}.product_id == MediaProduct.id',
+      secondaryjoin='Review.product_id == MediaProduct.id',
+      viewonly=True,
+      lazy='dynamic'
+    )

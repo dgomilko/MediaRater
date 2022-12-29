@@ -3,7 +3,6 @@ from random import sample, randint
 from dao.product.product_daos import *
 from dao.product.ProductDao import ProductDao
 from dao.user.userDao import UserDao
-from dao.review.review_daos import *
 from dao.review.ReviewDao import ReviewDao
 from db.models import *
 

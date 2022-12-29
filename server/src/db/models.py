@@ -39,40 +39,16 @@ class Movie(ProductMixin, db.Model):
   __tablename__ = 'movies'
   runtime = db.Column(db.String(20), nullable=False)
   director = db.Column(db.String(100), nullable=False)
-  reviews = db.relationship(
-    'Review',
-    secondary='media_products',
-    primaryjoin='Movie.product_id == MediaProduct.id',
-    secondaryjoin='Review.product_id == MediaProduct.id',
-    viewonly=True,
-    lazy='dynamic'
-  )
 
 class Book(ProductMixin, db.Model):
   __tablename__ = 'books'
   pages = db.Column(db.String(5), nullable=False)
   author = db.Column(db.String(100), nullable=False)
-  reviews = db.relationship(
-    'Review',
-    secondary='media_products',
-    primaryjoin='Book.product_id == MediaProduct.id',
-    secondaryjoin='Review.product_id == MediaProduct.id',
-    viewonly=True,
-    lazy='dynamic'
-  )
 
 class Show(ProductMixin, db.Model):
   __tablename__ = 'shows'
   seasons = db.Column(db.Integer, nullable=False)
   episodes = db.Column(db.Integer, nullable=False)
-  reviews = db.relationship(
-    'Review',
-    secondary='media_products',
-    primaryjoin='Show.product_id == MediaProduct.id',
-    secondaryjoin='Review.product_id == MediaProduct.id',
-    viewonly=True,
-    lazy='dynamic'
-  )
 
 class User(StrIdMixin, db.Model):
   __tablename__ = 'users'
@@ -87,21 +63,6 @@ class User(StrIdMixin, db.Model):
     back_populates='user',
     lazy='dynamic'
   )
-  # movie_reviews = db.relationship(
-  #   'MovieReview',
-  #   back_populates='user',
-  #   lazy='dynamic'
-  # )
-  # book_reviews = db.relationship(
-  #   'BookReview',
-  #   back_populates='user',
-  #   lazy='dynamic'
-  # )
-  # show_reviews = db.relationship(
-  #   'ShowReview',
-  #   back_populates='user',
-  #   lazy='dynamic'
-  # )
 
   @validates('gender')
   def validate_gender(self: db.Model, key: str, gender: str) -> str:
@@ -142,30 +103,6 @@ class Review(IntIdMixin, db.Model):
     back_populates='reviews',
     uselist=False
   )
-
-# class BookReview(ReviewMixin, db.Model):
-#   __tablename__ = 'book_reviews'
-#   product_id = db.Column(
-#     db.String(22),
-#     db.ForeignKey('books.id')
-#   )
-#   product = db.relationship(
-#     'Book',
-#     back_populates='reviews',
-#     uselist=False
-#   )
-
-# class ShowReview(ReviewMixin, db.Model):
-#   __tablename__ = 'show_reviews'
-#   product_id = db.Column(
-#     db.String(22),
-#     db.ForeignKey('shows.id')
-#   )
-#   product = db.relationship(
-#     'Show',
-#     back_populates='reviews',
-#     uselist=False
-#   )
 
 class BlacklistedToken(IntIdMixin, db.Model):
   __tablename__ = 'blacklisted_tokens'

@@ -4,7 +4,6 @@ from flask import request
 from dao.user.userDao import UserDao
 from dao.review.ReviewDao import ReviewDao 
 from dao.product.ProductDao import ProductDao
-from dao.review.review_daos import *
 from constants.err_messages import *
 from dao.product.product_daos import *
 from controllers.utils import get_kwargs
