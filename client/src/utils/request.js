@@ -8,7 +8,7 @@ const request = async (method, route, body, options, token) => {
   if (method === 'POST') {
     requestInfo.body = JSON.stringify(body);
   };
-  const url = `${process.env.REACT_APP_SERVER}/${route}`;
+  const url = `${process.env.REACT_APP_SERVER}/api/${route}`;
   try {
     const response = await fetch(url, requestInfo);
     const json = await response.json();

@@ -5,7 +5,7 @@ from controllers.user_controller import register, login, logout, check_token
 
 authenticate = Blueprint('authenticate', __name__)
  
-authenticate.route("/register", methods=['POST'])(register)
-authenticate.route('/login', methods = ['POST'])(login)
-authenticate.route('/logout', methods = ['POST'])(logout)
-authenticate.route('/check-token', methods = ['GET'])(check_token)
+authenticate.route("/api/register", methods=['POST'])(register)
+authenticate.route('/api/login', methods = ['POST'])(login)
+authenticate.route('/api/logout', methods = ['POST'])(logout)
+authenticate.route('/api/check-token', methods = ['GET'])(check_token)

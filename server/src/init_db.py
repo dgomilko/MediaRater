@@ -10,6 +10,7 @@ def init_db(app, populate=False):
   engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
   if not database_exists(engine.url):
     create_database(engine.url)
+  db.create_all()
   if populate: populate_db()
 
 def conf_db_populate():

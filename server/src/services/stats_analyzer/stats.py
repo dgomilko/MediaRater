@@ -1,6 +1,18 @@
 from services.stats_analyzer.utils import *
 from itertools import groupby
 
+age_fn = lambda gap, x: x['age'] >= gap[0] and x['age'] <= gap[1]
+gen_fn = lambda gen, x: x['gender'] == gen[0]
+rate_fn = lambda r, x: x['rate'] == r
+
+fns = {
+  'age': age_fn,
+  'gender': gen_fn,
+  'gen_rate': lambda r, g, x: gen_fn(g, x) and rate_fn(r, x),
+  'age_rate': lambda r, age, x: age_fn(age, x) and rate_fn(r, x),
+  'rate': rate_fn
+}
+
 def process_stats(stats):
   gender_labels = ['female', 'male']
   rating_labels = list(range(6))
@@ -12,19 +24,21 @@ def process_stats(stats):
       'x': key,
       'y': list(group),
     }) for key, group in groupby(stats, key=lambda x: x['created'])]
+  date_grouped.sort(key=lambda x: x['x'])
+  
+  date_cumsum_avg = list()
+  cur_count = 0
+  cur_sum = 0
+  for val in date_grouped:
+    cur_count += len(val['y'])
+    cur_sum += sum([x['rate'] for x in val['y']])
+    date_cumsum_avg.append({
+      'x': val['x'],
+      'y': round(cur_sum / cur_count, 2)
+    })
 
-  age_fn = lambda gap, x: x['age'] >= gap[0] and x['age'] <= gap[1]
-  gen_fn = lambda gen, x: x['gender'] == gen[0]
-  rate_fn = lambda r, x: x['rate'] == r
+  print(date_cumsum_avg)
   filtered_len = lambda fn: len(list(filter(fn, stats)))
-
-  fns = {
-    'age': age_fn,
-    'gender': gen_fn,
-    'gen_rate': lambda r, g, x: gen_fn(g, x) and rate_fn(r, x),
-    'age_rate': lambda r, age, x: age_fn(age, x) and rate_fn(r, x),
-    'rate': rate_fn
-  }
 
   return {
     'Viewers by age': {
@@ -103,12 +117,9 @@ def process_stats(stats):
         'labels': [],
         'datasets': [{
           'label': 'Average rating',
-          'data': [{
-            **g,
-            'y': round(sum([x['rate'] for x in g['y']]) / len(g['y']), 2)
-          } for g in date_grouped],
-          'borderColor': gen_color()
-        }]
+          'data': date_cumsum_avg,
+          }],
+        'borderColor': gen_color()
       }
     },
 
@@ -117,7 +128,10 @@ def process_stats(stats):
         'labels': [],
         'datasets': [{
           'label': rate,
-          'data': [{**g, 'y': len([x for x in g['y'] if rate_fn(rate, x)])} for g in date_grouped],
+          'data': [{
+              **g,
+              'y': len([x for x in g['y'] if rate_fn(rate, x)])
+            } for g in date_grouped],
           'borderColor': gen_color()
         } for rate in rating_labels]
       }

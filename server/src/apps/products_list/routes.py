@@ -6,12 +6,12 @@ from controllers.product_controller import load, genres
 products_list = Blueprint('products_list', __name__)
 
 routes_fns = {
-  '/movies': lambda: load(MovieDao),
-  '/shows': lambda: load(ShowDao),
-  '/books': lambda: load(BookDao),
-  '/movie-genres': lambda: genres(MovieDao),
-  '/show-genres': lambda: genres(ShowDao),
-  '/book-genres': lambda: genres(BookDao),
+  '/api/movies': lambda: load(MovieDao),
+  '/api/shows': lambda: load(ShowDao),
+  '/api/books': lambda: load(BookDao),
+  '/api/movie-genres': lambda: genres(MovieDao),
+  '/api/show-genres': lambda: genres(ShowDao),
+  '/api/book-genres': lambda: genres(BookDao),
 }
 
 register_routes(products_list, routes_fns)

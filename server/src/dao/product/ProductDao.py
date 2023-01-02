@@ -47,7 +47,7 @@ class ProductDao(Dao):
     rating = ProductDao.__get_rating(result)
     common = product_mapper(result)
     common['rating'] = rating
-    # common['reviews'] = len(result.reviews.all())
+    common['reviews'] = len(result.reviews.all())
     return (result, common)
 
   @staticmethod

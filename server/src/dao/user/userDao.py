@@ -60,4 +60,3 @@ class UserDao(Dao):
   @staticmethod
   def get_ids() -> list[str]:
     return [x[0] for x in User.query.with_entities(User.id).all()]
-    

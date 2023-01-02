@@ -31,12 +31,17 @@ export default function Home() {
         <p>Welcome. Explore, review and get recommendations now.</p>
       </div>
       <p className={popular}>What's popular:</p>
-      {products.map((arr, i) => (
-        <div className={productWrapper}>
-          <span className={typeTitle}>{types[i]}:</span>
-          {loading[i] ? <Loading /> : <Scrollable data={arr} type={types[i]} />}
-        </div>
-      ))}
+      {products.map((arr, i) => {
+        const type = types[i];
+        return (
+          <div className={productWrapper}>
+            <span className={typeTitle}>
+              {type.charAt(0).toUpperCase() + `${type.slice(1)}s`}:
+            </span>
+            {loading[i] ? <Loading /> : <Scrollable data={arr} type={type} />}
+          </div>
+        )
+      })}
     </div>
   );
 };

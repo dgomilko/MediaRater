@@ -12,22 +12,23 @@ from dao.user.userDao import UserDao
 def get_recommendations(
   dao_type: str,
   user_id: str,
-  top_n: int = 10
+  top_n: int = 20
 ) -> list[dict]:
   (
     (lookup_uid, lookup_pid),
     (uids, pids),
-    reviews,
     product_dao
   ) = get_params(dao_type)
   key = f'matrix_{dao_type}'
   matrix = cache.get(key)
-  if matrix is None: matrix = train_model(
-    (lookup_uid, lookup_pid),
-    (len(uids), len(pids)),
-    np.array(reviews),
-    key
-  )
+  if matrix is None:
+    reviews = ReviewDao.get_ratings(dao_type)
+    matrix = train_model(
+      (lookup_uid, lookup_pid),
+      (len(uids), len(pids)),
+      np.array(reviews),
+      key
+    )
   mapped_uid = np.where(lookup_uid == user_id)[0][0]
   unrated = np.where(matrix[mapped_uid] == 0)[0]
   predicted = model.predict(user_ids=int(mapped_uid), item_ids=unrated)
@@ -37,7 +38,8 @@ def get_recommendations(
 
 @celery.task()
 def update_model(dao_type: str) -> list[dict]:
-  (lookups, (uids, pids), reviews, _) = get_params(dao_type)
+  (lookups, (uids, pids), _) = get_params(dao_type)
+  reviews = ReviewDao.get_ratings(dao_type)
   key = f'matrix_{dao_type}'
   train_model(
     lookups,
@@ -89,9 +91,8 @@ def get_params(dao_type):
     'book': BookDao
   }
   product_dao = types[dao_type]
-  reviews = ReviewDao.get_ratings(dao_type)
   pids = product_dao.get_ids()
   uids = UserDao.get_ids()
   lookup_uid, _ = np.unique(uids, return_inverse=True)
   lookup_pid, _ = np.unique(pids, return_inverse=True)
-  return ((lookup_uid, lookup_pid), (uids, pids), reviews, product_dao)
+  return ((lookup_uid, lookup_pid), (uids, pids), product_dao)

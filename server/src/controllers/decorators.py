@@ -32,7 +32,7 @@ def authorization_needed(func: callable) -> callable:
   @functools.wraps(func)
   def wrapped(*args, **kwargs):
     auth_header = request.headers.get('Authorization')
-    err = err_response(ErrMsg.AUTH_REQUIRED, HTTPStatus.FORBIDDEN)
+    err = err_response(ErrMsg.AUTH_REQUIRED, HTTPStatus.UNAUTHORIZED)
     if not auth_header: return err
     header_split = auth_header.split(' ')
     if len(header_split) < 2: return err

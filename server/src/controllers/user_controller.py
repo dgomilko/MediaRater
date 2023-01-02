@@ -83,7 +83,7 @@ def profile() -> tuple[dict, int]:
   del user['password']
   return {**user, 'my_page': my_page}, HTTPStatus.OK
 
-# @authorization_needed
+@authorization_needed
 @expected_fields(['id'])
 def recommend_products(p_type: str) -> tuple[dict, int]:
   uid = request.get_json()['id']
@@ -97,7 +97,7 @@ def recommend_products(p_type: str) -> tuple[dict, int]:
   task = get_recommendations.apply_async(args=[p_type, uid])
   return {'task_id': task.id }, HTTPStatus.OK
 
-# @authorization_needed
+@authorization_needed
 def get_result(task_id: str) -> tuple[dict, int]:
   task = celery.AsyncResult(task_id)
   state = {'status': task.state}
