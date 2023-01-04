@@ -3,8 +3,8 @@ import { Navigate } from 'react-router-dom'
 import ErrorWrapper from '../ErrorWrapper';
 import Submitter from './Submitter';
 import InputField from './InputField';
-import { UserContext } from '../../contexts/UserContext';
 import CountrySelector from './countrySelector/CountrySelector';
+import { UserContext } from '../../contexts/UserContext';
 import useRegisterHandler from '../../hooks/auth/useRegisterHandler';
 import { signUpVerifiers } from '../../verifiers/signUpVerifiers';
 import {

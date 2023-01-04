@@ -21,7 +21,7 @@ export default function useLogoutHandler() {
             throw new Error(message);
         }
       },
-      errHandler: (e) => setError(e)
+      errHandler: e => setError(e)
     };
 
     await authApi.logout({}, options, token);

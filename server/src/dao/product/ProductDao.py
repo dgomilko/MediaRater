@@ -102,12 +102,13 @@ class ProductDao(Dao):
       'title': order_fn(MediaProduct.title),
       'rating': null_order(order_fn('rating')),
       'popular': null_order(order_fn(func.count(Review.rate))),
+      'date': order_fn(MediaProduct.release),
     }
     query = db.session.query(
         model,
         func.avg(Review.rate).label('rating'),
-      ).outerjoin(Review, Review.id == model.product_id) \
-      .join(MediaProduct)
+      ).join(MediaProduct, MediaProduct.id == model.product_id) \
+      .outerjoin(Review, Review.product_id == MediaProduct.id)
     if year_filter_needed:
       year_filter = and_(
         MediaProduct.release >= min_year,
@@ -118,8 +119,7 @@ class ProductDao(Dao):
       query = query.filter(year_filter)
     if genres: query = query \
       .filter(MediaProduct.genres.any(Genre.name.in_(genres)))
-
-    result = query.group_by(model.id, MediaProduct.title) \
+    result = query.group_by(model.id, MediaProduct.title, MediaProduct.release) \
       .order_by(sorting[filter]) \
       .distinct() \
       .having(rate_filter) \

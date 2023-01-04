@@ -23,11 +23,7 @@ export default function App() {
     '/user/:id/*': Profile
   };
 
-  const wrapped = El => (
-    <ExpirationWrapper>
-      <El />
-    </ExpirationWrapper>
-  );
+  const wrapped = El => <ExpirationWrapper><El /></ExpirationWrapper>;
 
   return (
     <div>

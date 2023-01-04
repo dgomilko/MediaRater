@@ -4,7 +4,7 @@ from controllers.user_controller import recommend_products, get_result
 
 recommend = Blueprint('recommend', __name__)
 
-recommend.route('/recommend/get-result/<task_id>')(get_result)
+recommend.route('/api/recommend/get-result/<task_id>')(get_result)
 
 routes_fns = {
   '/api/recommend/rec-movies': lambda: recommend_products('movie'),

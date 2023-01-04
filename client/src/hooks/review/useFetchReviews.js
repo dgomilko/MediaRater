@@ -14,16 +14,14 @@ export default function useFetchReviews(type, searchOptions = {}) {
   const { options, data, error, setError, loading, setLoading } =
     defaultOptions();
   const { id } = params;
-  const deps = [pageData];
 
   useEffect(() => {
     if (!id) return;
-    console.log('trigger', searchOptions)
     mainApi[`${type}Reviews`](
       { id, page: pageData.page, ...searchOptions },
       options
     );
-  }, deps);
+  }, [pageData]);
 
   useEffect(() => {
     if (!data.reviews) return;

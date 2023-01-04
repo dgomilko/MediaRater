@@ -31,7 +31,7 @@ export default function useRegisterHandler(verifiers) {
             throwResError(json) :
           storeData(json);
       },
-      errHandler: (e) => setError(e)
+      errHandler: e => setError(e)
     }
 
     await authApi.register(userData, options);

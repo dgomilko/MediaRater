@@ -20,7 +20,7 @@ export default function useProductsFetch(type, pageData, searchOptions = {}) {
         }
         else setItems(json.products);
       },
-      errHandler: (e) => setError(e)
+      errHandler: e => setError(e)
     };
 
     mainApi[type]({ page, ...searchOptions }, options);

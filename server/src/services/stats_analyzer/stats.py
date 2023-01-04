@@ -118,8 +118,8 @@ def process_stats(stats):
         'datasets': [{
           'label': 'Average rating',
           'data': date_cumsum_avg,
-          }],
-        'borderColor': gen_color()
+          'borderColor': gen_color()
+        }],
       }
     },
 

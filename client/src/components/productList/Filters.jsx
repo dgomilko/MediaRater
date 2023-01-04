@@ -38,6 +38,7 @@ export default function Filters({ setOptions, options, onClick }) {
         'Popularity': 'popular',
         'Product title': 'title',
         'Rating': 'rating',
+        'Release year': 'date',
       },
       field: 'filter'
     },

@@ -80,7 +80,7 @@ def load(dao: ProductDao):
   page = data['page']
   options = {
     'order': ['asc', 'desc'],
-    'filter': ['title', 'rating', 'popular'],
+    'filter': ['title', 'rating', 'popular', 'date'],
     'min_rate': list(range(0, 6)),
     'max_rate': list(range(0, 6)),
   }

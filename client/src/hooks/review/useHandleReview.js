@@ -32,7 +32,7 @@ export default function useHandleReview(type, id, closeFn) {
           userDispatch({ type: 'SET_INFO', payload: { expired: false }});
         }
       },
-      errHandler: (e) => setError(e),
+      errHandler: e => setError(e),
       finallyHandler: () => closeFn(),
     };
     await mainApi[`${type}ReviewAdd`](body, options, token);

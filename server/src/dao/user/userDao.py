@@ -50,12 +50,12 @@ class UserDao(Dao):
       .join(prod_model, MediaProduct.id == prod_model.product_id)
 
   @staticmethod
-  def count_reviews(uid: str, attr: str) -> int:
-    result = super(UserDao, UserDao).get_by_id(User, uid)
-    return len(list(
-      Review.query.join(MediaProduct)
-        .join(UserDao.types[attr]).all()
-    )) if result else 0
+  def count_reviews(uid: str, attr: str) -> int: 
+    result = Review.query.filter_by(user_id=uid) \
+      .join(MediaProduct) \
+      .join(UserDao.types[attr]) \
+      .all()
+    return len(list(result)) if result else 0
 
   @staticmethod
   def get_ids() -> list[str]:

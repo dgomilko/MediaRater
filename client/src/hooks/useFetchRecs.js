@@ -43,7 +43,7 @@ export default function useFetchRecs(type) {
         headers: { 'Authorization': `Bearer ${token}` }
       };
       const url =
-        `${process.env.REACT_APP_SERVER}/recommend/get-result/${taskId}`;
+        `${process.env.REACT_APP_SERVER}/api/recommend/get-result/${taskId}`;
       try {
         const response = await fetch(url, requestInfo);
         const json = await response.json();

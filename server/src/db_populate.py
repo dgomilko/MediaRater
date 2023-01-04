@@ -12,78 +12,151 @@ MOVIES_PATH = './media_data/movies.csv'
 BOOKS_PATH = './media_data/books.csv'
 
 users = [
+#   {
+#     'name': 'user1',
+#     'email': 'sada@gmail.com',
+#     'country': 'GB',
+#     'birthday': '1990.08.12',
+#     'password': 'asdkl34jk',
+#     'gender': 'f'
+#   },
+#   {
+#     'name': 'user2',
+#     'email': 'adsad@gmail.com',
+#     'country': 'Sweden',
+#     'birthday': '1999.10.14',
+#     'password': 'asdkl34jk',
+#     'gender': 'm'
+#   },
+#   {
+#     'name': 'user3',
+#     'email': 'oooo4234@gmail.com',
+#     'country': 'Ukraine',
+#     'birthday': '2000.10.14',
+#     'password': 'asdkl34jk',
+#     'gender': 'm'
+#   },
+#   {
+#     'name': 'user4',
+#     'email': 'ad___e@gmail.com',
+#     'country': 'Ukraine',
+#     'birthday': '2001.12.11',
+#     'password': 'asdkl34jk',
+#     'gender': 'f'
+#   },
+#   {
+#     'name': 'user5',
+#     'email': 'ad_fds__e@gmail.com',
+#     'country': 'Ukraine',
+#     'birthday': '2000.12.11',
+#     'password': 'asdkl34jk',
+#     'gender': 'f'
+#   },
+#   {
+#     'name': 'user6',
+#     'email': 'ad_fds_d_e@gmail.com',
+#     'country': 'Ukraine',
+#     'birthday': '2000.12.11',
+#     'password': 'asdkl34jk',
+#     'gender': 'm'
+#   },
+#   {
+#     'name': 'user7',
+#     'email': 'afds_d_e@gmail.com',
+#     'country': 'Ukraine',
+#     'birthday': '2000.12.11',
+#     'password': 'asdkl34jk',
+#     'gender': 'm'
+#   },
+#   {
+#     'name': 'user8',
+#     'email': 'afdsdssddd_d_e@gmail.com',
+#     'country': 'Ukraine',
+#     'birthday': '1995.12.11',
+#     'password': 'asdkl34jk',
+#     'gender': 'm'
+#   },
+#   {
+#     'name': 'user8',
+#     'email': 'ae@gmail.com',
+#     'country': 'Ukraine',
+#     'birthday': '2005.12.11',
+#     'password': 'asdkl34jk',
+#     'gender': 'f'
+#   }
+
   {
-    'name': 'user1',
-    'email': 'sada@gmail.com',
-    'country': 'GB',
-    'birthday': '1990.08.12',
+    'name': 'james',
+    'email': 'jamesgmail.com',
+    'country': 'Italy',
+    'birthday': '1980.08.12',
+    'password': 'asdkl34jk',
+    'gender': 'm'
+  },
+  {
+    'name': 'Maria',
+    'email': 'mary@gmail.com',
+    'country': 'Moldova',
+    'birthday': '2004.10.14',
     'password': 'asdkl34jk',
     'gender': 'f'
   },
   {
-    'name': 'user2',
-    'email': 'adsad@gmail.com',
-    'country': 'Sweden',
-    'birthday': '1999.10.14',
-    'password': 'asdkl34jk',
-    'gender': 'm'
-  },
-  {
-    'name': 'user3',
-    'email': 'oooo4234@gmail.com',
+    'name': 'JaneDoe',
+    'email': 'jd@gmail.com',
     'country': 'Ukraine',
-    'birthday': '2000.10.14',
-    'password': 'asdkl34jk',
-    'gender': 'm'
-  },
-  {
-    'name': 'user4',
-    'email': 'ad___e@gmail.com',
-    'country': 'Ukraine',
-    'birthday': '2001.12.11',
+    'birthday': '1977.10.14',
     'password': 'asdkl34jk',
     'gender': 'f'
   },
   {
-    'name': 'user5',
-    'email': 'ad_fds__e@gmail.com',
+    'name': 'Petro',
+    'email': 'petee@gmail.com',
     'country': 'Ukraine',
-    'birthday': '2000.12.11',
+    'birthday': '1998.12.11',
     'password': 'asdkl34jk',
-    'gender': 'f'
+    'gender': 'm'
   },
   {
-    'name': 'user6',
-    'email': 'ad_fds_d_e@gmail.com',
-    'country': 'Ukraine',
+    'name': 'movieLover',
+    'email': 'ml@gmail.com',
+    'country': 'Estonia',
+    'birthday': '1988.12.11',
+    'password': 'asdkl34jk',
+    'gender': 'm'
+  },
+  {
+    'name': 'qwertypoll',
+    'email': 'polliq6@gmail.com',
+    'country': 'Moldova',
     'birthday': '2000.12.11',
     'password': 'asdkl34jk',
     'gender': 'm'
   },
   {
-    'name': 'user7',
-    'email': 'afds_d_e@gmail.com',
+    'name': 'just_me',
+    'email': 'iamauser@gmail.com',
     'country': 'Ukraine',
-    'birthday': '2000.12.11',
+    'birthday': '1982.12.11',
     'password': 'asdkl34jk',
     'gender': 'm'
   },
   {
-    'name': 'user8',
-    'email': 'afdsdssddd_d_e@gmail.com',
-    'country': 'Ukraine',
-    'birthday': '1995.12.11',
+    'name': 'mrRudolf',
+    'email': 'rud@gmail.com',
+    'country': 'Germany',
+    'birthday': '1993.12.11',
     'password': 'asdkl34jk',
     'gender': 'm'
   },
   {
-    'name': 'user8',
-    'email': 'ae@gmail.com',
-    'country': 'Ukraine',
+    'name': 'proserpina',
+    'email': 'pros@gmail.com',
+    'country': 'Spain',
     'birthday': '2005.12.11',
     'password': 'asdkl34jk',
     'gender': 'f'
-  }
+  },
 ]
 
 db_details = {
@@ -113,12 +186,12 @@ def populate_reviews(
     db_user = User.query.filter_by(name=user['name']).first()
     reiewed_products = sample(products, randint(0, 250))
     for product in reiewed_products:
-      db_product = product_model.query.join(MediaProduct) \
-        .filter_by(title=product['title']).first()
+      # db_product = product_model.query.join(MediaProduct) \
+      #   .filter_by(title=product['title']).first()
       review_data = {
         'user_id': db_user.id,
-        'product_id': db_product.id,
-        'rate': randint(0, 5)
+        'product_id': product,
+        'rate': randint(3, 5)
       }
       ReviewDao.add_new(review_data, review_type)
 
@@ -127,5 +200,6 @@ def populate_db():
   for path, (
     product_model, product_dao, review_dao
   ) in db_details.items():
-    products = populate_product(path, product_dao)
+    # products = populate_product(path, product_dao)
+    products = product_dao.get_ids()
     populate_reviews(products, review_dao, product_model)

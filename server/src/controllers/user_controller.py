@@ -92,6 +92,7 @@ def recommend_products(p_type: str) -> tuple[dict, int]:
   if not user_exists:
     return err_response(ErrMsg.NO_USER, HTTPStatus.NOT_FOUND)
   reviews = UserDao.count_reviews(uid, p_type)
+  print(reviews)
   if reviews < min_reviews:
     return err_response(ErrMsg.NO_RECS, HTTPStatus.NOT_FOUND)
   task = get_recommendations.apply_async(args=[p_type, uid])

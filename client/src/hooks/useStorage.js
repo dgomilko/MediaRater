@@ -24,7 +24,7 @@ export default function useStorage() {
     userDispatch({type: 'CLEAR'});
   };
 
-  const handleExpiration = (data) => {
+  const handleExpiration = data => {
     if (data.message === messages.EXPIRED)
       userDispatch({type: 'SET_INFO', payload: { expired: true }});
     throwResError(data);

@@ -29,7 +29,7 @@ export default function useLoginHandler(verifiers) {
           else throwResError(json);
         else storeData(json);
       },
-      errHandler: (e) => setError(e)
+      errHandler: e => setError(e)
     }
     await authApi.login(userData, options);
   };
