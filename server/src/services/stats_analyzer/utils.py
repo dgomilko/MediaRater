@@ -3,13 +3,15 @@ from random import randrange
 gen_color = lambda: f'rgba({", ".join([str(randrange(256)) for _ in range(3)])}, 0.7)'
 
 def get_age_groups():
-  max_age = 14
+  min_age = 14
+  max_age = 100
+  age_step = 5
   res = list()
-  res.append((0, max_age))
-  while max_age + 5 <= 100:
-    next = max_age + 5
-    res.append((max_age + 1, next))
-    max_age = next
+  res.append((0, min_age))
+  while min_age + age_step <= max_age:
+    next = min_age + 5
+    res.append((min_age + 1, next))
+    min_age = next
   return res
 
 def get_top_countries(stats):

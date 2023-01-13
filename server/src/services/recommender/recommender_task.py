@@ -53,11 +53,12 @@ def create_matrix(
   dims: tuple[int],
   rates: np.ndarray
 ) -> np.ndarray:
+  positive_threshhold = 3
   map_ids = lambda lookup, arr: [np.where(lookup == x)[0][0] for x in arr]
   int_rates = np.vstack(np.array((
     map_ids(lookups[0], rates[:,1]),
     map_ids(lookups[1], rates[:,0]),
-    [1 if int(x) > 3 else -1 for x in rates[:,2]])
+    [1 if int(x) > positive_threshhold else -1 for x in rates[:,2]])
   ).T)
   matrix = np.zeros(dims)
   for x, y, rate in int_rates: matrix[x][y] = rate
